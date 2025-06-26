@@ -188,17 +188,28 @@ def dashboard():
             ]
             hover_barras.mode = 'mouse'
             
-            # Crear leyenda interactiva
+            # CORRECCIÓN: Crear leyenda solo con géneros presentes
             legend_items = []
-            for genero, color in color_map.items():
-                legend_items.append(LegendItem(label=genero, renderers=[r], index=data['genero'].index(genero)))
+            generos_presentes = set(data['genero'])
             
-            legend = Legend(
-                items=legend_items,
-                location="top_right",
-                click_policy="mute"
-            )
-            p1.add_layout(legend, 'right')
+            for genero in generos_presentes:
+                if genero in color_map:
+                    # Crear un glifo invisible para la leyenda
+                    r_legend = p1.circle(
+                        x=[-100], y=[-100], 
+                        size=0,
+                        color=color_map[genero],
+                        alpha=0
+                    )
+                    legend_items.append(LegendItem(label=genero, renderers=[r_legend]))
+            
+            if legend_items:
+                legend = Legend(
+                    items=legend_items,
+                    location="top_right",
+                    click_policy="mute"
+                )
+                p1.add_layout(legend, 'right')
             
             # Añadir separadores de semestre con espacio extra
             for i, (semestre, position) in enumerate(semestre_positions.items()):
