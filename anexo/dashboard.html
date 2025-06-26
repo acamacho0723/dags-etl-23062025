@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Académico</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    
+      <link rel="icon" 
+        type="image/png" 
+        href="{{ url_for('static', filename='img/dashboard.png') }}">
+    
+    <!-- Incluir recursos de Bokeh -->
+    {% for css in bokeh_resources['css'] %}
+        <link rel="stylesheet" href="{{ css }}">
+    {% endfor %}
+    {% for js in bokeh_resources['js'] %}
+        <script src="{{ js }}"></script>
+    {% endfor %}
+</head>
+<body>
+    <div class="theme-switcher">
+        <button class="theme-btn" id="theme-toggle">Modo Oscuro</button>
+    </div>
+    
+    <div class="container">
+        <div class="header">
+            <h1>Dashboard Académico</h1>
+        </div>
+        
+        <div class="instruction-card">
+            <h3>¿Cómo usar este dashboard?</h3>
+            <ul>
+                <li><strong>Filtros:</strong> Seleccione semestres, géneros y materias para filtrar los datos.</li>
+                <li><strong>Gráfico de Barras:</strong> Muestra el promedio por materia y género. Haga clic en la leyenda para resaltar/ocultar géneros.</li>
+                <li><strong>Gráfico de Dispersión:</strong> Relación entre promedio y asistencia. Puede hacer zoom y pan para explorar.</li>
+                <li><strong>Reiniciar Filtros:</strong> Use el botón rojo para volver a la vista inicial.</li>
+                <li><strong>Modo Oscuro:</strong> Active/desactive con el botón superior derecho.</li>
+            </ul>
+        </div>
+        
+        <form method="GET" class="filtros">
+            <div class="filtro-group">
+                <h3>Filtros:</h3>
+            </div>
+            
+            <div class="filtro-row">
+                <div class="filtro-col">
+                    <label for="semestre">Semestre:</label>
+                    <select name="semestre" multiple size="5">
+                        {% for semestre in semestres %}
+                            <option value="{{ semestre }}" 
+                                {% if semestre in filtro_semestre %}selected{% endif %}>
+                                {{ semestre }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="filtro-col">
+                    <label for="genero">Género:</label>
+                    <select name="genero" multiple size="5">
+                        {% for genero in generos %}
+                            <option value="{{ genero }}" 
+                                {% if genero in filtro_genero %}selected{% endif %}>
+                                {{ genero }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="filtro-col">
+                    <label for="materia_id">Materia:</label>
+                    <select name="materia_id" multiple size="10">
+                        <option value="0" {% if '0' in filtro_materia %}selected{% endif %}>Todas las materias</option>
+                        {% for semestre, materias in materias_agrupadas %}
+                            <optgroup label="Semestre {{ semestre }}">
+                                {% for id, nombre in materias %}
+                                    <option value="{{ id }}" 
+                                        {% if id|string in filtro_materia %}selected{% endif %}>
+                                        {{ nombre }}
+                                    </option>
+                                {% endfor %}
+                            </optgroup>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            
+            <div class="button-group">
+                <button type="submit">Aplicar Filtros</button>
+                <button type="button" class="reset-btn" id="reset-btn">Reiniciar Filtros</button>
+            </div>
+        </form>
+        
+        <div class="grafico">
+            <h2>Promedio por Materia y Género</h2>
+            <div class="bokeh-wrapper">
+                {{ div1 | safe }}
+            </div>
+            {{ script1 | safe }}
+        </div>
+        
+        <div class="grafico">
+            <h2>Promedio vs Asistencia</h2>
+            <div class="bokeh-wrapper">
+                {{ div2 | safe }}
+            </div>
+            {{ script2 | safe }}
+        </div>
+    </div>
+    
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
