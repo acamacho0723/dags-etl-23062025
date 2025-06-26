@@ -1,0 +1,7 @@
+1. Promedio de alumno
+2. Total de asistencias
+3. Total de inasistencias
+4. Porcentaje de asistencias
+5. Casilla de riesgo de reprobación (True o False dependiendo de la asistencia <70% y promedio <6)
+
+6. Promedio por materia (tomando en cuenta que hay alumnos que no toman algunas materias dado su semestre)

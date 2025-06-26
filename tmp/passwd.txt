@@ -1,0 +1,7 @@
+database host address: fedivej259.mysql.pythonanywhere-services.com
+
+username: fedivej259
+
+passwd: 24062025_
+
+name: fedivej259$default
