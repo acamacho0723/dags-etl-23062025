@@ -188,19 +188,23 @@ def dashboard():
             ]
             hover_barras.mode = 'mouse'
             
-            # CORRECCIÓN: Crear leyenda solo con géneros presentes
+            # CORRECCIÓN: Crear leyenda con cuadrados visibles
             legend_items = []
             generos_presentes = set(data['genero'])
             
             for genero in generos_presentes:
                 if genero in color_map:
-                    # Crear un glifo invisible para la leyenda
-                    r_legend = p1.circle(
+                    # Crear un glifo visible para la leyenda
+                    r_legend = p1.square(
                         x=[-100], y=[-100], 
-                        size=0,
-                        color=color_map[genero],
-                        alpha=0
+                        size=15, 
+                        fill_color=color_map[genero],
+                        line_color='black',
+                        alpha=1.0,
+                        name=f'legend_{genero}'
                     )
+                    # Hacer invisible pero mantener color en leyenda
+                    r_legend.visible = False
                     legend_items.append(LegendItem(label=genero, renderers=[r_legend]))
             
             if legend_items:
