@@ -1,44 +1,79 @@
+---
+jupyter:
+  jupytext:
+    text_representation:
+      extension: .md
+      format_name: markdown
+      format_version: '1.3'
+      jupytext_version: 1.17.2
+  kernelspec:
+    display_name: base
+    language: python
+    name: python3
+---
+
 <img src = "media\Portada.jpg">
+
 
 # Objetivo del trabajo
 
+
 Desarrollar un prototipo de dashboard web interactivo que centralice y visualice esta información para que los coordinadores académicos puedan identificar patrones y áreas de oportunidad rápidamente.
+
 
 # Metodología Ágil
 
+
 Para la organización de nuestra actividad, hicimos uso de los siguientes elementos:
+
 
 ## User Story map
 
+
 <img src = 'media\mi tablero de trello\tablero.png'>
+
 
 <img src = 'media\mi tablero de trello\1.1.png'>
 
+
 <img src = 'media\mi tablero de trello\1.15.png'>
+
 
 <img src = 'media\mi tablero de trello\1.2.png' >
 
+
 <img src = 'media\mi tablero de trello\1.25.png'>
+
 
 <img src = 'media\Capturas Sprint Backlog\2.3.png'>
 
+
 <img src = 'media\Capturas Sprint Backlog\2.4.png'>
+
 
 <img src = 'media\Capturas Sprint Backlog\2.5.png'>
 
+
 <img src ='media\Capturas Sprint Backlog\2.6.png'>
+
 
 <img src = 'media\Capturas Sprint Backlog\2.7.png'>
 
+
 ## Sprint Backlog
+
 
 <img src = 'media\Capturas Sprint Backlog\Tablero.png'>
 
+
 ## Product Backlog
+
 
 <img src = 'media\Product Backlog\Tablero.png'>
 
+
 # Creación de los datasets para el análisis
+
 
 Para desarrollar nuestra actividad, requerimos de tres archivos csv que contengan:
 1. Calificaciones
@@ -50,13 +85,18 @@ para mínimo 100 estudiantes. En nuestro equipo, decidimos centrarnos en estudia
 
 Con esto en mente, nos propusimos desarollar un código de python para cada uno de los datasets para nuestra actividad.
 
+
 ## Dataset de calificaciones
+
 
 Con el fin de trabajar con diversos semestres, obtuvimos una lista de los módulos para cada uno de ellos, basándonos en la siguiente tabla:
 
+
 <img src = "media\1. Mapa curricular.png">
 
+
 ###### Diagrama obtenido de <a href = "media\Mapa Curricular.pdf">Mapa Curricular CDIA</a>
+
 
 Dado que estamos en la segunda mitad del año, usamos los semestres 2, 4 y 6. 
 
@@ -118,8 +158,10 @@ Se ensuciaron algunos registros de la siguiente manera:
 
 A partir de estos datos, desarrollamos un programa para generar el dataset, el cual podemos desenvolver en los siguientes pasos:
 
+
 ### 1. Generación del CSV original
 
+<!-- #region -->
 ```python
 import pandas as pd
 import numpy as np
@@ -195,6 +237,8 @@ with open(r'tmp\calificaciones.csv', 'w', newline='', encoding='utf-8-sig') as c
         writer.writerow(registro)
 
 print("Archivo original 'calificaciones.csv' generado exitosamente!")
+```
+<!-- #endregion -->
 
 <strong>Importaciones</strong>
 
@@ -223,8 +267,10 @@ print("Archivo original 'calificaciones.csv' generado exitosamente!")
 - Se abre (o crea) el archivo `tmp\calificaciones.csv` con <em>codificación UTF-8 con BOM</em>.  
 - Se escribe la cabecera y luego todas las filas de notas.
 
+
 ### 2. Carga del CSV y <i>ensuciamiento</i> de los datos
 
+<!-- #region -->
 ```python
 # === Parte 2: Cargar y ensuciar internamente ===
 
@@ -257,6 +303,8 @@ for idx in registros_ensuciar:
         elif operacion == 'dividir':
             # Dividir entre 100
             df.at[idx, materia] = df.at[idx, materia] / 100
+```
+<!-- #endregion -->
 
 <strong>Carga del CSV en un DataFrame de pandas</strong>
 
@@ -287,8 +335,10 @@ for idx in registros_ensuciar:
 
 - Finalmente, se reemplazan los valores `NaN` por cadenas vacías (`''`) para evitar problemas en exportaciones posteriores.
 
+
 ### 3. Muestreo y exportaciones múltiples
 
+<!-- #region -->
 ```python
 # === Parte 3: Muestreo aleatorio y exportación múltiple ===
 
@@ -370,7 +420,8 @@ print(f"- CSV original: csv{os.sep}calificaciones.csv")
 print(f"- Muestra CSV: data{os.sep}calificaciones{os.sep}calificaciones.csv")
 print(f"- Muestra JSON: data{os.sep}calificaciones{os.sep}calificaciones.json")
 print(f"- Muestra XML: data{os.sep}calificaciones{os.sep}calificaciones.xml")
-
+```
+<!-- #endregion -->
 
 <strong>Barajado y partición del DataFrame</strong>
 
@@ -398,10 +449,11 @@ print(f"- Muestra XML: data{os.sep}calificaciones{os.sep}calificaciones.xml")
   - Se escapan los caracteres especiales: `&`, `<`, `>` en los valores de texto.
   - El archivo se guarda en `data/calificaciones/calificaciones.xml`.
 
+
 ### 4. Ejecución del generador
 
-Integramos todo lo anterior dentro de la siguiente celda y lo ejecutamos:
 
+Integramos todo lo anterior dentro de la siguiente celda y lo ejecutamos:
 
 ```python
 import pandas as pd
@@ -586,549 +638,22 @@ print(f"- Muestra JSON: data{os.sep}calificaciones{os.sep}calificaciones.json")
 print(f"- Muestra XML: data{os.sep}calificaciones{os.sep}calificaciones.xml")
 ```
 
-    Archivo original 'calificaciones.csv' generado exitosamente!
-    Proceso completado exitosamente!
-    Archivos generados:
-    - CSV original: csv\calificaciones.csv
-    - Muestra CSV: data\calificaciones\calificaciones.csv
-    - Muestra JSON: data\calificaciones\calificaciones.json
-    - Muestra XML: data\calificaciones\calificaciones.xml
-    
-
 y cargamos una muestra de cada uno de los datos de salida:
-
 
 ```python
 pd.read_csv(r"data\calificaciones\calificaciones.csv").head()
 ```
 
-
-
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>MATRICULA</th>
-      <th>SEMESTRE</th>
-      <th>Representación simbólica y angular del entorno</th>
-      <th>Comunicación activa en inglés</th>
-      <th>Relación entre compuestos orgánicos y el entorno</th>
-      <th>Comunicación en los ámbitos escolar y profesional</th>
-      <th>Emprendimiento e innovación</th>
-      <th>Manejo de aplicaciones por medios digitales</th>
-      <th>Desarrollo de pensamiento computacional</th>
-      <th>Identificación de redes de computadoras</th>
-      <th>...</th>
-      <th>Aplicación de protocolos de datos</th>
-      <th>Aplicación de modelos ETL</th>
-      <th>Análisis de tendencias en datos</th>
-      <th>Tratamiento de datos y azar</th>
-      <th>Interpretación de normas de convivencia ambiental</th>
-      <th>Filosofía</th>
-      <th>Aplicación de modelos predictivos</th>
-      <th>Presentación y análisis prescriptivo de los datos</th>
-      <th>Análisis del lenguaje natural</th>
-      <th>Gestión de rendimiento de los datos</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>1084</td>
-      <td>6</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>...</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>49.0</td>
-      <td>84.0</td>
-      <td>63.0</td>
-      <td>80.0</td>
-      <td>81.0</td>
-      <td>54.0</td>
-      <td>97.0</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>1054</td>
-      <td>4</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>...</td>
-      <td>83.0</td>
-      <td>59.0</td>
-      <td>72.0</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>1071</td>
-      <td>2</td>
-      <td>63.0</td>
-      <td>73.0</td>
-      <td>25.0</td>
-      <td>84.0</td>
-      <td>81.0</td>
-      <td>45.0</td>
-      <td>64.0</td>
-      <td>67.0</td>
-      <td>...</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>1046</td>
-      <td>2</td>
-      <td>75.0</td>
-      <td>10.0</td>
-      <td>76.0</td>
-      <td>62.0</td>
-      <td>75.0</td>
-      <td>77.0</td>
-      <td>2.0</td>
-      <td>61.0</td>
-      <td>...</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>1045</td>
-      <td>6</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>...</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>62.0</td>
-      <td>91.0</td>
-      <td>86.0</td>
-      <td>92.0</td>
-      <td>72.0</td>
-      <td>100.0</td>
-      <td>98.0</td>
-    </tr>
-  </tbody>
-</table>
-<p>5 rows × 26 columns</p>
-</div>
-
-
-
-
 ```python
 pd.read_json(r"data\calificaciones\calificaciones.json").head()
 ```
-
-
-
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>MATRICULA</th>
-      <th>SEMESTRE</th>
-      <th>Representación simbólica y angular del entorno</th>
-      <th>Comunicación activa en inglés</th>
-      <th>Relación entre compuestos orgánicos y el entorno</th>
-      <th>Comunicación en los ámbitos escolar y profesional</th>
-      <th>Emprendimiento e innovación</th>
-      <th>Manejo de aplicaciones por medios digitales</th>
-      <th>Desarrollo de pensamiento computacional</th>
-      <th>Identificación de redes de computadoras</th>
-      <th>...</th>
-      <th>Aplicación de protocolos de datos</th>
-      <th>Aplicación de modelos ETL</th>
-      <th>Análisis de tendencias en datos</th>
-      <th>Tratamiento de datos y azar</th>
-      <th>Interpretación de normas de convivencia ambiental</th>
-      <th>Filosofía</th>
-      <th>Aplicación de modelos predictivos</th>
-      <th>Presentación y análisis prescriptivo de los datos</th>
-      <th>Análisis del lenguaje natural</th>
-      <th>Gestión de rendimiento de los datos</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>1029</td>
-      <td>4</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>...</td>
-      <td>61.0</td>
-      <td>79.0</td>
-      <td>98.0</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>1094</td>
-      <td>6</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>...</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>78.0</td>
-      <td>69.0</td>
-      <td>26.0</td>
-      <td>96.0</td>
-      <td>70.0</td>
-      <td>70.0</td>
-      <td>83.0</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>1006</td>
-      <td>2</td>
-      <td>79.0</td>
-      <td>88.0</td>
-      <td>82.0</td>
-      <td>57.0</td>
-      <td>68.0</td>
-      <td>73.0</td>
-      <td>74.0</td>
-      <td>92.0</td>
-      <td>...</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>1067</td>
-      <td>2</td>
-      <td>91.0</td>
-      <td>62.0</td>
-      <td>89.0</td>
-      <td>98.0</td>
-      <td>60.0</td>
-      <td>84.0</td>
-      <td>75.0</td>
-      <td>95.0</td>
-      <td>...</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>1066</td>
-      <td>6</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>...</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>71.0</td>
-      <td>73.0</td>
-      <td>75.0</td>
-      <td>89.0</td>
-      <td>70.0</td>
-      <td>64.0</td>
-      <td>78.0</td>
-    </tr>
-  </tbody>
-</table>
-<p>5 rows × 26 columns</p>
-</div>
-
-
-
 
 ```python
 pd.read_xml(r"data\calificaciones\calificaciones.xml").head()
 ```
 
-
-
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>MATRICULA</th>
-      <th>SEMESTRE</th>
-      <th>Representación_simbólica_y_angular_del_entorno</th>
-      <th>Comunicación_activa_en_inglés</th>
-      <th>Relación_entre_compuestos_orgánicos_y_el_entorno</th>
-      <th>Comunicación_en_los_ámbitos_escolar_y_profesional</th>
-      <th>Emprendimiento_e_innovación</th>
-      <th>Manejo_de_aplicaciones_por_medios_digitales</th>
-      <th>Desarrollo_de_pensamiento_computacional</th>
-      <th>Identificación_de_redes_de_computadoras</th>
-      <th>...</th>
-      <th>Aplicación_de_protocolos_de_datos</th>
-      <th>Aplicación_de_modelos_ETL</th>
-      <th>Análisis_de_tendencias_en_datos</th>
-      <th>Tratamiento_de_datos_y_azar</th>
-      <th>Interpretación_de_normas_de_convivencia_ambiental</th>
-      <th>Filosofía</th>
-      <th>Aplicación_de_modelos_predictivos</th>
-      <th>Presentación_y_análisis_prescriptivo_de_los_datos</th>
-      <th>Análisis_del_lenguaje_natural</th>
-      <th>Gestión_de_rendimiento_de_los_datos</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>1047.0</td>
-      <td>6.0</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>...</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>71.0</td>
-      <td>73.0</td>
-      <td>64.0</td>
-      <td>92.0</td>
-      <td>88.0</td>
-      <td>59.0</td>
-      <td>88.0</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>1069.0</td>
-      <td>6.0</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>...</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>61.0</td>
-      <td>66.0</td>
-      <td>66.0</td>
-      <td>90.0</td>
-      <td>67.0</td>
-      <td>61.0</td>
-      <td>80.0</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>1062.0</td>
-      <td>4.0</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>...</td>
-      <td>72.0</td>
-      <td>65.0</td>
-      <td>42.0</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>1098.0</td>
-      <td>4.0</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>...</td>
-      <td>81.0</td>
-      <td>97.0</td>
-      <td>75.0</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>1080.0</td>
-      <td>4.0</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>...</td>
-      <td>80.0</td>
-      <td>63.0</td>
-      <td>73.0</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-    </tr>
-  </tbody>
-</table>
-<p>5 rows × 26 columns</p>
-</div>
-
-
-
 ## Dataset de asistencias
+
 
 De la misma manera, nos propusimos crear el dataset de asistencias con una solución implementada en python. 
 
@@ -1137,13 +662,17 @@ Se ensuciaron algunos registros, aplicando la siguiente regla:
 
 El programa que utilizamos para este dataset se desarrolló en las etapas que mostramos a continuación:
 
+
 ### 1. Importación de librerías
 
+<!-- #region -->
 ```python
 import pandas as pd
 import numpy as np
 import os
 import re
+```
+<!-- #endregion -->
 
 <strong>Descripción de módulos usados</strong>
 
@@ -1155,20 +684,25 @@ import re
 
 - <code>re</code>: Expresiones regulares, utilizadas más adelante para validar nombres.
 
+
 ### 2. Generar lista de matrículas
 
+<!-- #region -->
 ```python
 # 1. Generar lista de matrículas desde 1001 hasta 1100
 matriculas = list(range(1001, 1101))
-
+```
+<!-- #endregion -->
 
 <strong>Generación de IDs de alumnos</strong>
 
 - Se crea una lista de enteros del <code>1001</code> al <code>1100</code>.
 - Cada número representa el <strong>ID único</strong> de un alumno.
 
+
 ### 3. Crear rango de fechas de Lunes a Viernes
 
+<!-- #region -->
 ```python
 # 2. Generar el rango de fechas de lunes a viernes
 fechas = pd.date_range(
@@ -1178,6 +712,8 @@ fechas = pd.date_range(
 )
 # Formatear como dd/mm/YYYY
 fechas_str = fechas.strftime("%d/%m/%Y")
+```
+<!-- #endregion -->
 
 <strong>Generación de fechas hábiles</strong>
 
@@ -1187,14 +723,18 @@ fechas_str = fechas.strftime("%d/%m/%Y")
 
 - <code>.strftime("%d/%m/%Y")</code>: Convierte cada fecha en una cadena con el formato <strong>"día/mes/año"</strong>.
 
+
 ### 4. Construir dataframe vacío
 
+<!-- #region -->
 ```python
 # 3. Crear DataFrame vacío con índices = matrículas y columnas = fechas
 df = pd.DataFrame(
     index=matriculas,
     columns=fechas_str
 )
+```
+<!-- #endregion -->
 
 <strong>Creación de la tabla de asistencia</strong>
 
@@ -1205,8 +745,10 @@ df = pd.DataFrame(
 
 - Inicialmente, todas las celdas contienen el valor <code>NaN</code>.
 
+
 ### 5. Rellenar asistencias aleatorias
 
+<!-- #region -->
 ```python
 # 4. Rellenar asistencias de forma aleatoria (“S” o “N”)
 np.random.seed(42)  # para reproducibilidad
@@ -1215,6 +757,8 @@ df[:] = np.random.choice(
     size=(len(matriculas), len(fechas_str)),
     p = [0.7, 0.3]
 )
+```
+<!-- #endregion -->
 
 <strong>Generación aleatoria de asistencias</strong>
 
@@ -1230,12 +774,16 @@ df[:] = np.random.choice(
 
 - Ese arreglo se asigna directamente al <strong>DataFrame completo</strong>.
 
+
 ### 6. Convertir el índice en columna
 
+<!-- #region -->
 ```python
 # 5. Preparar para exportar: convertir el índice en columna “MATRICULA”
 df.index.name = "MATRICULA"
 df.reset_index(inplace=True)
+```
+<!-- #endregion -->
 
 <strong>Ajuste del índice en el DataFrame</strong>
 
@@ -1247,8 +795,10 @@ df.reset_index(inplace=True)
 
   - El índice se reemplaza por un índice numérico estándar (<code>0…N</code>).
 
+
 #### A. Borrar un 1% de asistencias
 
+<!-- #region -->
 ```python
 # A. Borrar un 1% de las asistencias (convertirlas a NaN)
 num_filas, num_columnas = df.shape
@@ -1266,6 +816,8 @@ if num_celdas_borrar > 0:
 
 # Convertir todos los NaN a string vacío
 df = df.fillna("")
+```
+<!-- #endregion -->
 
 <strong>Inserción de valores faltantes</strong>
 
@@ -1277,12 +829,16 @@ df = df.fillna("")
 
 - Al final, todos los <code>NaN</code> se reemplazan por <code>""</code> (cadena vacía) para mantener consistencia.
 
+
 #### B. Renombrar columnas de fecha
 
+<!-- #region -->
 ```python
 # B. Renombrar columnas de fecha para formato válido (reemplazar / por -)
 nuevas_columnas = ['MATRICULA'] + [fecha.replace('/', '-') for fecha in fechas_str]
 df.columns = nuevas_columnas
+```
+<!-- #endregion -->
 
 <strong>Formato de encabezados de fecha</strong>
 
@@ -1290,18 +846,24 @@ df.columns = nuevas_columnas
 
 - Esa lista se asigna como los nuevos <code>df.columns</code>, manteniendo <strong>"MATRICULA"</strong> como la primera columna.
 
+
 #### C. Crear carpeta de salida
 
+<!-- #region -->
 ```python
 # C. Crear directorio principal si no existe
 os.makedirs("data/asistencia", exist_ok=True)
+```
+<!-- #endregion -->
 
 <strong>Creación de carpeta de salida</strong>
 
 - Se asegura de que exista la ruta <code>data/asistencia</code> para volcar los archivos generados.
 
+
 #### D. Exportar en 3 formatos
 
+<!-- #region -->
 ```python
 # D. Guardar en tres formatos diferentes (muestreo aleatorio)
 # Mezclar el DataFrame
@@ -1315,13 +877,17 @@ partes = [
     df_muestreo.iloc[tam_parte:2*tam_parte],
     df_muestreo.iloc[2*tam_parte:]
 ]
+```
+<!-- #endregion -->
 
 1. <strong>Barajea</strong>(`.sample(frac=1)`) todo el DataFrame y reinicia índices.
 
 2. Parte el resultado en 3 trozos iguales (o lo más cercanos posible).
 
+
 #### E. Validación de nombres XML
 
+<!-- #region -->
 ```python
 def make_valid_xml_name(col_name: str) -> str:
     # Si empieza por dígito, anteponemos '_'
@@ -1339,13 +905,17 @@ for c in df_xml.columns:
     else:
         new_cols.append(make_valid_xml_name(c))
 df_xml.columns = new_cols
+```
+<!-- #endregion -->
 
 - Define `make_valid_xml_name()`: si el nombre arranca con número, le antepone _.
 
 - Aplica solo al <strong>trozo 2</strong> (`partes[1]`), porque en XML los tags no pueden empezar con dígito.
 
+
 #### F. Guardado Final
 
+<!-- #region -->
 ```python
 # 1) CSV
 partes[0].to_csv(r"data/asistencia/asistencia.csv", index=False, encoding="utf-8")
@@ -1364,6 +934,8 @@ print("Proceso completado:")
 print(f"- CSV guardado en: data/asistencia/asistencia.csv")
 print(f"- XML guardado en: data/asistencia/asistencia.xml")
 print(f"- JSON guardado en: data/asistencia/asistencia.json")
+```
+<!-- #endregion -->
 
 - <strong>Parte 0</strong> → CSV convencional (`.to_csv`).
 
@@ -1373,10 +945,11 @@ print(f"- JSON guardado en: data/asistencia/asistencia.json")
 
 - Al final imprime en consola las rutas donde quedan los 3 archivos
 
+
 ### Ejecución
 
-Integramos todo lo anterior dentro del siguiente código y lo corremos:
 
+Integramos todo lo anterior dentro del siguiente código y lo corremos:
 
 ```python
 import pandas as pd
@@ -1485,546 +1058,22 @@ print(f"- XML guardado en: data/asistencia/asistencia.xml")
 print(f"- JSON guardado en: data/asistencia/asistencia.json")
 ```
 
-    Proceso completado:
-    - CSV guardado en: data/asistencia/asistencia.csv
-    - XML guardado en: data/asistencia/asistencia.xml
-    - JSON guardado en: data/asistencia/asistencia.json
-    
-
 Procedemos a cargar la cabecera de los resultados:
-
 
 ```python
 pd.read_csv(r"data\asistencia\asistencia.csv").head()
 ```
 
-
-
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>MATRICULA</th>
-      <th>17-02-2025</th>
-      <th>18-02-2025</th>
-      <th>19-02-2025</th>
-      <th>20-02-2025</th>
-      <th>21-02-2025</th>
-      <th>24-02-2025</th>
-      <th>25-02-2025</th>
-      <th>26-02-2025</th>
-      <th>27-02-2025</th>
-      <th>...</th>
-      <th>23-06-2025</th>
-      <th>24-06-2025</th>
-      <th>25-06-2025</th>
-      <th>26-06-2025</th>
-      <th>27-06-2025</th>
-      <th>30-06-2025</th>
-      <th>01-07-2025</th>
-      <th>02-07-2025</th>
-      <th>03-07-2025</th>
-      <th>04-07-2025</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>1084</td>
-      <td>N</td>
-      <td>S</td>
-      <td>N</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-      <td>...</td>
-      <td>S</td>
-      <td>S</td>
-      <td>N</td>
-      <td>N</td>
-      <td>N</td>
-      <td>N</td>
-      <td>S</td>
-      <td>S</td>
-      <td>N</td>
-      <td>N</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>1054</td>
-      <td>N</td>
-      <td>S</td>
-      <td>N</td>
-      <td>N</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-      <td>N</td>
-      <td>...</td>
-      <td>S</td>
-      <td>S</td>
-      <td>N</td>
-      <td>S</td>
-      <td>N</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-      <td>N</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>1071</td>
-      <td>S</td>
-      <td>S</td>
-      <td>N</td>
-      <td>N</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-      <td>...</td>
-      <td>S</td>
-      <td>N</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-      <td>N</td>
-      <td>S</td>
-      <td>S</td>
-      <td>N</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>1046</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-      <td>N</td>
-      <td>S</td>
-      <td>S</td>
-      <td>...</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-      <td>N</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>1045</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-      <td>N</td>
-      <td>S</td>
-      <td>N</td>
-      <td>S</td>
-      <td>S</td>
-      <td>...</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-      <td>N</td>
-      <td>N</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-    </tr>
-  </tbody>
-</table>
-<p>5 rows × 101 columns</p>
-</div>
-
-
-
-
 ```python
 pd.read_json(r"data\asistencia\asistencia.json").head()
 ```
-
-
-
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>MATRICULA</th>
-      <th>17-02-2025</th>
-      <th>18-02-2025</th>
-      <th>19-02-2025</th>
-      <th>20-02-2025</th>
-      <th>21-02-2025</th>
-      <th>24-02-2025</th>
-      <th>25-02-2025</th>
-      <th>26-02-2025</th>
-      <th>27-02-2025</th>
-      <th>...</th>
-      <th>23-06-2025</th>
-      <th>24-06-2025</th>
-      <th>25-06-2025</th>
-      <th>26-06-2025</th>
-      <th>27-06-2025</th>
-      <th>30-06-2025</th>
-      <th>01-07-2025</th>
-      <th>02-07-2025</th>
-      <th>03-07-2025</th>
-      <th>04-07-2025</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>1047</td>
-      <td>S</td>
-      <td>N</td>
-      <td>N</td>
-      <td>S</td>
-      <td>N</td>
-      <td>N</td>
-      <td>N</td>
-      <td>S</td>
-      <td>N</td>
-      <td>...</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-      <td>N</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-      <td>N</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>1069</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-      <td>N</td>
-      <td>N</td>
-      <td>S</td>
-      <td>S</td>
-      <td>...</td>
-      <td>S</td>
-      <td>N</td>
-      <td>N</td>
-      <td>S</td>
-      <td>S</td>
-      <td>N</td>
-      <td>N</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>1062</td>
-      <td>S</td>
-      <td>N</td>
-      <td>S</td>
-      <td>N</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-      <td>...</td>
-      <td>S</td>
-      <td>S</td>
-      <td>N</td>
-      <td>N</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-      <td>N</td>
-      <td>S</td>
-      <td>S</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>1098</td>
-      <td>N</td>
-      <td>S</td>
-      <td>N</td>
-      <td>N</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-      <td>...</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-      <td>N</td>
-      <td>S</td>
-      <td>S</td>
-      <td>N</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>1080</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-      <td>N</td>
-      <td>S</td>
-      <td>N</td>
-      <td>S</td>
-      <td>N</td>
-      <td>S</td>
-      <td>...</td>
-      <td>S</td>
-      <td></td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-      <td>N</td>
-      <td>S</td>
-    </tr>
-  </tbody>
-</table>
-<p>5 rows × 101 columns</p>
-</div>
-
-
-
 
 ```python
 pd.read_xml(r"data\asistencia\asistencia.xml").head()
 ```
 
-
-
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>MATRICULA</th>
-      <th>_17-02-2025</th>
-      <th>_18-02-2025</th>
-      <th>_19-02-2025</th>
-      <th>_20-02-2025</th>
-      <th>_21-02-2025</th>
-      <th>_24-02-2025</th>
-      <th>_25-02-2025</th>
-      <th>_26-02-2025</th>
-      <th>_27-02-2025</th>
-      <th>...</th>
-      <th>_23-06-2025</th>
-      <th>_24-06-2025</th>
-      <th>_25-06-2025</th>
-      <th>_26-06-2025</th>
-      <th>_27-06-2025</th>
-      <th>_30-06-2025</th>
-      <th>_01-07-2025</th>
-      <th>_02-07-2025</th>
-      <th>_03-07-2025</th>
-      <th>_04-07-2025</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>1029</td>
-      <td>N</td>
-      <td>N</td>
-      <td>N</td>
-      <td>N</td>
-      <td>S</td>
-      <td>N</td>
-      <td>N</td>
-      <td>S</td>
-      <td>S</td>
-      <td>...</td>
-      <td>S</td>
-      <td>S</td>
-      <td>N</td>
-      <td>S</td>
-      <td>S</td>
-      <td>N</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>1094</td>
-      <td>S</td>
-      <td>S</td>
-      <td>N</td>
-      <td>S</td>
-      <td>N</td>
-      <td>S</td>
-      <td>S</td>
-      <td>N</td>
-      <td>S</td>
-      <td>...</td>
-      <td>N</td>
-      <td>N</td>
-      <td>S</td>
-      <td>N</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>1006</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-      <td>N</td>
-      <td>S</td>
-      <td>S</td>
-      <td>N</td>
-      <td>N</td>
-      <td>N</td>
-      <td>...</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-      <td>N</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>1067</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-      <td>N</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-      <td>N</td>
-      <td>...</td>
-      <td>N</td>
-      <td>S</td>
-      <td>S</td>
-      <td>N</td>
-      <td>S</td>
-      <td>N</td>
-      <td>S</td>
-      <td>S</td>
-      <td>N</td>
-      <td>S</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>1066</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-      <td>N</td>
-      <td>N</td>
-      <td>N</td>
-      <td>N</td>
-      <td>...</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-      <td>None</td>
-      <td>N</td>
-      <td>S</td>
-      <td>S</td>
-      <td>S</td>
-      <td>N</td>
-      <td>S</td>
-    </tr>
-  </tbody>
-</table>
-<p>5 rows × 101 columns</p>
-</div>
-
-
-
 ## Dataset de datos demográficos
+
 
 Finalmente, nos propusimos crear un dataset con algunos datos relevantes del alumnado de esta actividad. Los datos demográficos incluidos son:
 1. Nombre
@@ -2055,8 +1104,10 @@ También ensuciaremos algunos registros de la siguiente manera:
 
 Desarrollamos un generador para este último dataset, tomando en cuenta todos estos elementos y a través de los siguientes pasos:
 
+
 ### 1. Importaciones y creación de carpetas
 
+<!-- #region -->
 ```python
 import pandas as pd
 import numpy as np
@@ -2068,6 +1119,8 @@ import random
 # Crear directorios necesarios
 os.makedirs("tmp", exist_ok=True)
 os.makedirs("data/datos_demograficos", exist_ok=True)
+```
+<!-- #endregion -->
 
 1. <strong>Importaciones</strong>
 - `pandas` y `numpy` para manejar tablas y arreglos.
@@ -2083,14 +1136,18 @@ os.makedirs("data/datos_demograficos", exist_ok=True)
 
 - `data/datos_demograficos` donde se volcarán los nuevos archivos.
 
+
 ### 2. Lectura del CSV base
 
+<!-- #region -->
 ```python
 # === Leer archivo base ===
 # Leer el archivo calificaciones.csv para obtener matrículas y semestres
 df_base = pd.read_csv(r'tmp/calificaciones.csv', encoding='utf-8-sig')
 # Conservar solo las columnas necesarias
 df_base = df_base[['MATRICULA', 'SEMESTRE']]
+```
+<!-- #endregion -->
 
 1. Carga de `tmp/calificaciones.csv` en un DataFrame `df_base`.
 
@@ -2099,8 +1156,10 @@ df_base = df_base[['MATRICULA', 'SEMESTRE']]
 
 - `SEMESTRE` (en qué semestre está)
 
+
 ### 3. Definición de listas de datos demográficos
 
+<!-- #region -->
 ```python
 # === Configuración para datos demográficos ===
 nombres_femeninos = [
@@ -2131,6 +1190,8 @@ paises = {
     'GT': 'Guatemalteca',
     'CU': 'Cubana'
 }
+```
+<!-- #endregion -->
 
 - Tres listas con posibles primeros nombres (femeninos y masculinos).
 
@@ -2138,8 +1199,10 @@ paises = {
 
 - Un diccionario de códigos de país a nacionalidades.
 
+
 ### 4. Generación de registros demográficos
 
+<!-- #region -->
 ```python
 # === Generar datos demográficos ===
 datos = []
@@ -2195,6 +1258,8 @@ for _, row in df_base.iterrows():
 
 # Convertir la lista de dicts en DataFrame
 df = pd.DataFrame(datos)
+```
+<!-- #endregion -->
 
 1. <strong>Iteración</strong> sobre cada alumno del csv base.
 
@@ -2211,8 +1276,10 @@ df = pd.DataFrame(datos)
 
 6. Cada registro se guarda en la lista `datos` y finalmente se convierte en `df`.
 
+
 ### 5. <i>Ensuciar</i> parcialmente los datos
 
+<!-- #region -->
 ```python
 # === Ensuciar datos ===
 campos_ensuciar = ['NOMBRE', 'GENERO', 'FECHA_NACIMIENTO']
@@ -2228,6 +1295,8 @@ for idx in registros_ensuciar:
     campos_borrar = random.sample(campos_ensuciar, num_campos_borrar)
     for campo in campos_borrar:
         df.at[idx, campo] = ''
+```
+<!-- #endregion -->
 
 1. Define los campos candidatos a <i>ensuciar:</i>
 - `NOMBRE`
@@ -2240,8 +1309,10 @@ for idx in registros_ensuciar:
 
 4. Para cada fila elegida, borra entre 1 y 3 de los campos establecidos (los deja como cadena vacía) para simular datos faltantes.
 
+
 ### 6. Exportación a CSV, JSON y XML
 
+<!-- #region -->
 ```python
 # === Exportar a múltiples formatos ===
 
@@ -2296,6 +1367,8 @@ print("Archivos generados en 'data/datos_demograficos':")
 print("- datos_demograficos.csv")
 print("- datos_demograficos.json")
 print("- datos_demograficos.xml")
+```
+<!-- #endregion -->
 
 1. `sanitize_xml_name()`: convierte nombres de columna a etiquetas válidas para XML (sin espacios ni que empiecen en número).
 
@@ -2311,10 +1384,11 @@ print("- datos_demograficos.xml")
 
 5. <strong>Mensajes finales</strong> en consola con las rutas generadas
 
+
 ### 7. Ejecución
 
-Integramos todo lo anterior en la siguiente celda:
 
+Integramos todo lo anterior en la siguiente celda:
 
 ```python
 import pandas as pd
@@ -2492,292 +1566,22 @@ print("- datos_demograficos.json")
 print("- datos_demograficos.xml")
 ```
 
-    Proceso completado exitosamente!
-    Archivos generados en 'data/datos_demograficos':
-    - datos_demograficos.csv
-    - datos_demograficos.json
-    - datos_demograficos.xml
-    
-
 y cargamos la cabecera de los resultados:
-
 
 ```python
 pd.read_csv(r"data\datos_demograficos\datos_demograficos.csv").head()
 ```
 
-
-
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>MATRICULA</th>
-      <th>NOMBRE</th>
-      <th>APELLIDO_PATERNO</th>
-      <th>APELLIDO_MATERNO</th>
-      <th>GENERO</th>
-      <th>FECHA_NACIMIENTO</th>
-      <th>NACIONALIDAD</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>1001</td>
-      <td>Lucía</td>
-      <td>Álvarez</td>
-      <td>Díaz</td>
-      <td>F</td>
-      <td>04/04/2009</td>
-      <td>Española</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>1002</td>
-      <td>Isabella</td>
-      <td>Rodríguez</td>
-      <td>Martínez</td>
-      <td>F</td>
-      <td>05/05/2007</td>
-      <td>Cubana</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>1003</td>
-      <td>NaN</td>
-      <td>Torres</td>
-      <td>Jiménez</td>
-      <td>M</td>
-      <td>NaN</td>
-      <td>Estadounidense</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>1004</td>
-      <td>Renata</td>
-      <td>López</td>
-      <td>González</td>
-      <td>F</td>
-      <td>13/09/2008</td>
-      <td>Estadounidense</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>1005</td>
-      <td>Ana</td>
-      <td>Navarro</td>
-      <td>Romero</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>Mexicana</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-
 ```python
 pd.read_json(r"data\datos_demograficos\datos_demograficos.json").head()
 ```
-
-
-
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>MATRICULA</th>
-      <th>NOMBRE</th>
-      <th>APELLIDO_PATERNO</th>
-      <th>APELLIDO_MATERNO</th>
-      <th>GENERO</th>
-      <th>FECHA_NACIMIENTO</th>
-      <th>NACIONALIDAD</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>1001</td>
-      <td>Lucía</td>
-      <td>Álvarez</td>
-      <td>Díaz</td>
-      <td>F</td>
-      <td>04/04/2009</td>
-      <td>Española</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>1002</td>
-      <td>Isabella</td>
-      <td>Rodríguez</td>
-      <td>Martínez</td>
-      <td>F</td>
-      <td>05/05/2007</td>
-      <td>Cubana</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>1003</td>
-      <td></td>
-      <td>Torres</td>
-      <td>Jiménez</td>
-      <td>M</td>
-      <td></td>
-      <td>Estadounidense</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>1004</td>
-      <td>Renata</td>
-      <td>López</td>
-      <td>González</td>
-      <td>F</td>
-      <td>13/09/2008</td>
-      <td>Estadounidense</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>1005</td>
-      <td>Ana</td>
-      <td>Navarro</td>
-      <td>Romero</td>
-      <td></td>
-      <td></td>
-      <td>Mexicana</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
 
 ```python
 pd.read_xml(r"data\datos_demograficos\datos_demograficos.xml").head()
 ```
 
-
-
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>MATRICULA</th>
-      <th>NOMBRE</th>
-      <th>APELLIDO_PATERNO</th>
-      <th>APELLIDO_MATERNO</th>
-      <th>GENERO</th>
-      <th>FECHA_NACIMIENTO</th>
-      <th>NACIONALIDAD</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>1001</td>
-      <td>Lucía</td>
-      <td>Álvarez</td>
-      <td>Díaz</td>
-      <td>F</td>
-      <td>04/04/2009</td>
-      <td>Española</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>1002</td>
-      <td>Isabella</td>
-      <td>Rodríguez</td>
-      <td>Martínez</td>
-      <td>F</td>
-      <td>05/05/2007</td>
-      <td>Cubana</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>1003</td>
-      <td>None</td>
-      <td>Torres</td>
-      <td>Jiménez</td>
-      <td>M</td>
-      <td>None</td>
-      <td>Estadounidense</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>1004</td>
-      <td>Renata</td>
-      <td>López</td>
-      <td>González</td>
-      <td>F</td>
-      <td>13/09/2008</td>
-      <td>Estadounidense</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>1005</td>
-      <td>Ana</td>
-      <td>Navarro</td>
-      <td>Romero</td>
-      <td>None</td>
-      <td>None</td>
-      <td>Mexicana</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
 # Unión y cálculo de métricas
+
 
 Para nuestra actividad, decidimos implementar una fase en la que se juntan todos los datos a través de un identificador en común (`MATRICULA`) y luego decidimos calcular las siguientes métricas para su posterior análisis:
 1. Promedio de alumno.
@@ -2805,8 +1609,10 @@ Asimismo, los dataset recibidos tienen algunos registros sucios, que limpiaremos
 
 Esta fase se puede dividir dentro de las siguientes secciones:
 
+
 ## 1. Importaciones y Configuración Inicial
 
+<!-- #region -->
 ```python
 import pandas as pd
 import numpy as np
@@ -2865,6 +1671,8 @@ materias_por_semestre = {
         "Gestión de rendimiento de los datos"
     ]
 }
+```
+<!-- #endregion -->
 
 - Importa librerías clave para manejar datos, archivos, expresiones regulares y fechas.
 
@@ -2874,8 +1682,10 @@ materias_por_semestre = {
 
 - Mapea semestres (`2`, `4`, `6`) a sus asignaturas válidas.
 
+
 ## 2. Funciones de Carga de Archivos
 
+<!-- #region -->
 ```python
 def cargar_csv(ruta):
     return pd.read_csv(ruta, encoding='utf-8-sig')
@@ -2920,14 +1730,17 @@ def cargar_dataset(tipo):
         df = df.drop_duplicates().dropna(how='all')
         return df
     return pd.DataFrame()
-
+```
+<!-- #endregion -->
 
 - Proporciona funciones para leer CSV, JSON y XML.
 
 - `cargar_dataset` busca en la carpeta correspondiente, carga todos los formatos existentes, unifica en un solo `DataFrame` y limpia duplicados y filas vacías.
 
+
 ## 3. Utilidades de Inferencia y Formateo
 
+<!-- #region -->
 ```python
 def inferir_genero(nombre):
     nombre = str(nombre).strip()
@@ -2945,14 +1758,17 @@ def formatear_fecha(fecha_str):
         except ValueError:
             continue
     return fecha_limpia
-
+```
+<!-- #endregion -->
 
 - `inferir_genero`: marca `'F'` o `'M'` según el nombre esté en las listas, o devuelve una cadena vacía.
 
 - `formatear_fecha`: limpia la cadena, prueba varios patrones de parseo y devuelve la fecha en formato `dd/mm/YYYY`, o la cadena limpia si no encaja.
 
+
 ## 4. Corrección de Asistencias y Calificaciones
 
+<!-- #region -->
 ```python
 def corregir_asistencias(df):
     """Correcciones para el dataset de asistencias"""
@@ -3051,6 +1867,8 @@ def corregir_calificaciones(df_calif):
     df_calif['PROMEDIO'] = df_calif['MATRICULA'].map(promedios_alumno)
     
     return df_calif
+```
+<!-- #endregion -->
 
 - **Asistencias**:
   - Convierte marcadores “S/N” y variantes a booleanos `True`/`False`.
@@ -3064,8 +1882,10 @@ def corregir_calificaciones(df_calif):
   - Corrige valores anómalos (menores a `1` o mayores a `100`).
   - Añade la columna `PROMEDIO`.
 
+
 ## 5. Corrección de Datos Demográficos
 
+<!-- #region -->
 ```python
 def corregir_datos_demograficos(df_demo, df_calif):
     """Correcciones para el dataset demográfico"""
@@ -3141,6 +1961,8 @@ def corregir_datos_demograficos(df_demo, df_calif):
     })
     
     return df_demo
+```
+<!-- #endregion -->
 
 - Agrega el semestre al `DataFrame` demográfico.
 
@@ -3149,8 +1971,10 @@ def corregir_datos_demograficos(df_demo, df_calif):
 - Rellena fechas de nacimiento vacías con fechas por defecto según el semestre y las formatea.
 - Limpia columnas sobrantes y deja solo las finales, renombradas.
 
+
 ## 6. Función Principal y Consolidación
 
+<!-- #region -->
 ```python
 def main():
     # Cargar todos los datasets
@@ -3259,6 +2083,8 @@ def main():
 
 if __name__ == "__main__":
     main()
+```
+<!-- #endregion -->
 
 - Carga y corrige los tres datasets principales.
 
@@ -3267,12 +2093,14 @@ if __name__ == "__main__":
 - Añade una fila con los promedios por materia.
 - Exporta el resultado a un archivo CSV y reporta el resumen por consola.
 
+
 ## 7. Ejecución y comprobación
+
 
 ### Ejecución
 
-Todo lo anterior lo integramos dentro de la siguiente celda y procedemos a correrla:
 
+Todo lo anterior lo integramos dentro de la siguiente celda y procedemos a correrla:
 
 ```python
 import pandas as pd
@@ -3741,248 +2569,80 @@ if __name__ == "__main__":
     main()
 ```
 
-    Cargando datos de asistencias...
-    Cargando datos de calificaciones...
-    Cargando datos demográficos...
-    Aplicando correcciones a asistencias...
-    Aplicando correcciones a calificaciones...
-    Aplicando correcciones a datos demográficos...
-    Combinando datasets...
-    Calculando nuevas métricas...
-    Calculando promedio por materia...
-    
-    Proceso completado exitosamente!
-    Datos consolidados guardados en: data/consolidado/datos_consolidados.csv
-    Total de registros procesados: 101
-    Total de columnas: 137
-    Matrículas únicas: 100
-    
-
 Procedemos a cargar una muestra del resultado:
-
 
 ```python
 pd.read_csv(r"data\consolidado\datos_consolidados.csv").head()
 ```
 
-
-
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>MATRICULA</th>
-      <th>NOMBRE</th>
-      <th>APELLIDO_PATERNO</th>
-      <th>APELLIDO_MATERNO</th>
-      <th>GENERO</th>
-      <th>FECHA_NACIMIENTO</th>
-      <th>NACIONALIDAD</th>
-      <th>SEMESTRE</th>
-      <th>Representación simbólica y angular del entorno</th>
-      <th>Comunicación activa en inglés</th>
-      <th>...</th>
-      <th>27-06-2025</th>
-      <th>30-06-2025</th>
-      <th>01-07-2025</th>
-      <th>02-07-2025</th>
-      <th>03-07-2025</th>
-      <th>04-07-2025</th>
-      <th>TOTAL_ASISTENCIAS</th>
-      <th>TOTAL_INASISTENCIAS</th>
-      <th>PORCENTAJE_ASISTENCIA</th>
-      <th>RIESGO_REPROBACION</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>1001</td>
-      <td>Alumna</td>
-      <td>Álvarez</td>
-      <td>Díaz</td>
-      <td>F</td>
-      <td>04/04/2009</td>
-      <td>Española</td>
-      <td>2.0</td>
-      <td>91.0</td>
-      <td>93.0</td>
-      <td>...</td>
-      <td>0.0</td>
-      <td>1.0</td>
-      <td>1.0</td>
-      <td>1.0</td>
-      <td>1.0</td>
-      <td>1.0</td>
-      <td>69.0</td>
-      <td>31.0</td>
-      <td>69.0</td>
-      <td>1.0</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>1002</td>
-      <td>Alumna</td>
-      <td>Rodríguez</td>
-      <td>Martínez</td>
-      <td>F</td>
-      <td>05/05/2007</td>
-      <td>Cubana</td>
-      <td>6.0</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>...</td>
-      <td>1.0</td>
-      <td>1.0</td>
-      <td>0.0</td>
-      <td>0.0</td>
-      <td>0.0</td>
-      <td>0.0</td>
-      <td>70.0</td>
-      <td>30.0</td>
-      <td>70.0</td>
-      <td>0.0</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>1003</td>
-      <td>Alumno</td>
-      <td>Torres</td>
-      <td>Jiménez</td>
-      <td>M</td>
-      <td>01/01/2008</td>
-      <td>Estadounidense</td>
-      <td>4.0</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>...</td>
-      <td>1.0</td>
-      <td>1.0</td>
-      <td>0.0</td>
-      <td>1.0</td>
-      <td>1.0</td>
-      <td>1.0</td>
-      <td>68.0</td>
-      <td>32.0</td>
-      <td>68.0</td>
-      <td>0.0</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>1004</td>
-      <td>Alumna</td>
-      <td>López</td>
-      <td>González</td>
-      <td>F</td>
-      <td>13/09/2008</td>
-      <td>Estadounidense</td>
-      <td>4.0</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>...</td>
-      <td>1.0</td>
-      <td>0.0</td>
-      <td>0.0</td>
-      <td>1.0</td>
-      <td>0.0</td>
-      <td>0.0</td>
-      <td>70.0</td>
-      <td>30.0</td>
-      <td>70.0</td>
-      <td>0.0</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>1005</td>
-      <td>Ana</td>
-      <td>Navarro</td>
-      <td>Romero</td>
-      <td>F</td>
-      <td>01/01/2007</td>
-      <td>Mexicana</td>
-      <td>6.0</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>...</td>
-      <td>1.0</td>
-      <td>1.0</td>
-      <td>1.0</td>
-      <td>1.0</td>
-      <td>0.0</td>
-      <td>0.0</td>
-      <td>65.0</td>
-      <td>35.0</td>
-      <td>65.0</td>
-      <td>1.0</td>
-    </tr>
-  </tbody>
-</table>
-<p>5 rows × 137 columns</p>
-</div>
-
-
-
 ### Comprobación
+
 
 Corroboramos que:
 
+
 #### 1. Hay 100 registros de alumnos + la fila de promedio por materia
+
 
 <img src = "media\comprob\1. 100 registros.png">
 
+
 <strong>¡Podemos confirmar que todo esta en orden!</strong>
+
 
 #### 2. Los alumnos tienen las materias correctas
 
+
 Comprobamos que los alumnos de <strong>segundo</strong> tienen las materias que les corresponden:
+
 
 <img src = "media\comprob\2.1 Segundo.png">
 
+
 Comprobamos que los alumnos de <strong>cuarto</strong> tienen las materias que les corresponden:
+
 
 <img src = "media\comprob\2.3 Cuarto.png">
 
+
 Comprobamos que los alumnos de <strong>sexto</strong> tienen las materias que les corresponden:
+
 
 <img src = "media\comprob\2.2 Sexto.png">
 
+
 <strong>¡Podemos confirmar que todo esta en orden!</strong>
+
 
 #### 3. El promedio fue bien calculado para los alumnos de cada semestre
 
+
 Usamos las calificaciones de un alumno de cada semestre:
+
 
 <img src = "media\comprob\3.1 Promedios.png">
 
+
 y las contrastamos con las originales:
 
+
 <img src = "media\comprob\3.2 Promedios.png">
+
 
 En este caso, los promedios son de alumnos de:
 1. <strong>Segundo Semestre</strong>
 2. <strong>Sexto Semestre</strong>
 3. <strong>Cuarto Semestre</strong>
 
+
 #### 4. El conteo de asistencias es correcto
+
 
 Realizamos las siguientes operaciones dentro de una hoja de cálculo:
 
+
 <img src = "media\comprob\4. Asistencias.png">
+
 
 donde se implementaron las fórmulas:
 1. <strong>Total de días</strong>: `=COLUMNAS(A2:CV2)`
@@ -3995,161 +2655,66 @@ Y tomando en cuenta que hubo un rango de 100 días, <strong>el porcentaje de asi
 
 Contrastamos estos datos con los resultados del proceso previo: 
 
+
 <img src = "media\comprob\4.2 Asistencias.png">
+
 
 <strong>¡Podemos confirmar que todo esta en orden!</strong>
 
+
 #### 5. El promedio de una materia esta siendo calculado correctamente a pesar de los NaN
 
+
 <img src = "media\comprob\5.1 Promedio.png">
+
 
 Donde se implementó la fórmula `PROMEDIO` de Excel, que ignora registros vacíos.
 
 Luego, contrastamos con el cálculo del proceso de extracción:
 
+
 <img src = "media\comprob\5.2 Promedio.png">
+
 
 <strong>¡Podemos confirmar que todo esta en orden!</strong>
 
+
 ###### El archivo con las hojas de la comprobación se encuentra en <a href = "tmp\Comprobacion.xlsx"><i>Comprobacion.xlsx</i></a>
+
 
 # Estructura Multidimensional
 
+
 ## Propuesta
 
-Usando los datos del csv consolidado, realizamos el siguiente diccionario de datos:
 
+Usando los datos del csv consolidado, realizamos el siguiente diccionario de datos:
 
 ```python
 pd.read_excel(r"tmp\Diccionario - Consolidado.xlsx")
 ```
 
-
-
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>columna</th>
-      <th>descripción</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>MATRICULA</td>
-      <td>Identificador único del alumno</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>NOMBRE</td>
-      <td>Nombre propio del alumno</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>APELLIDO_PATERNO</td>
-      <td>Primer apellido del alumno</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>APELLIDO_MATERNO</td>
-      <td>Segundo apellido del alumno</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>GENERO</td>
-      <td>Sexo del alumno (“F”=femenino “M”=masculino)</td>
-    </tr>
-    <tr>
-      <th>5</th>
-      <td>FECHA_NACIMIENTO</td>
-      <td>Fecha de nacimiento en formato Día/Mes/Año</td>
-    </tr>
-    <tr>
-      <th>6</th>
-      <td>NACIONALIDAD</td>
-      <td>Código o nombre del país de origen del alumno</td>
-    </tr>
-    <tr>
-      <th>7</th>
-      <td>SEMESTRE</td>
-      <td>Número de semestre que cursa el alumno</td>
-    </tr>
-    <tr>
-      <th>8</th>
-      <td>[Nombre de cada materia]</td>
-      <td>Porcentaje obtenido por el alumno en esa mater...</td>
-    </tr>
-    <tr>
-      <th>9</th>
-      <td>PROMEDIO</td>
-      <td>Promedio aritmético de los porcentajes en toda...</td>
-    </tr>
-    <tr>
-      <th>10</th>
-      <td>17/02/2025 – 04/07/2025</td>
-      <td>Una columna por cada fecha de clase: “S” = asi...</td>
-    </tr>
-    <tr>
-      <th>11</th>
-      <td>TOTAL_ASISTENCIAS</td>
-      <td>Número total de “S” registradas para el alumno</td>
-    </tr>
-    <tr>
-      <th>12</th>
-      <td>TOTAL_INASISTENCIAS</td>
-      <td>Número total de “N” registradas para el alumno</td>
-    </tr>
-    <tr>
-      <th>13</th>
-      <td>PORCENTAJE_ASISTENCIA</td>
-      <td>Porcentaje de días asistidos sobre el total de...</td>
-    </tr>
-    <tr>
-      <th>14</th>
-      <td>RIESGO_REPROBACION</td>
-      <td>Indicador de probabilidad de reprobar (1 o 0)</td>
-    </tr>
-    <tr>
-      <th>15</th>
-      <td>PROMEDIO_MATERIA</td>
-      <td>Promedio ponderado de desempeño académico en l...</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
 ###### Para mejor visualización consulte <a href = "tmp\Diccionario - Consolidado.xlsx"><i>Diccionario - Consolidado.xlsx</i></a>
+
 
 Y usamos esta información para desarrollar el siguiente diseño de una base que nos permitirá realizar análisis multidimensional:
 
+
 <img src = "media\diagramas\1. Cubo.svg">
+
 
 ###### Para mejor visualización consulte <a href = "media\diagramas\1. Cubo.svg"><i>1. Cubo.svg</i></a>
 
+
 ## Implementación
+
 
 Para lograr migrar nuestros datos de csv a una estructura multidimensional en una base de datos relacional, hicimos uso de un código desarollado en las siguientes etapas:
 
+
 ### 1. Importación de librerías y definición de materias
 
+<!-- #region -->
 ```python
 import pandas as pd
 import numpy as np
@@ -4187,11 +2752,15 @@ materias_por_semestre = {
         "Gestión de rendimiento de los datos"
     ]
 }
+```
+<!-- #endregion -->
 
 Importa las librerías **Pandas** y **NumPy**, y define un diccionario que contiene las materias organizadas por semestre (**2**, **4** y **6**). Cada semestre tiene una lista de nombres de materias específicas.
 
+
 ### 2. Preparación de datos iniciales
 
+<!-- #region -->
 ```python
 # Obtener todas las materias
 todas_materias = []
@@ -4211,15 +2780,19 @@ columnas_demograficas = [
 # Separar la fila de promedios de materias
 df_prom_materia = df[df['MATRICULA'] == 'PROMEDIO_MATERIA']
 df_alumnos = df[df['MATRICULA'] != 'PROMEDIO_MATERIA']
+```
+<!-- #endregion -->
 
 - Combina todas las materias de todos los semestres en una sola lista (`todas_materias`).
 - Carga el archivo CSV consolidado en un **DataFrame**.
 - Define las columnas demográficas relevantes.
 - Separa los datos en dos **DataFrames**: uno para promedios de materias y otro para datos de alumnos.
 
+
 ### 3. Construcción de dimensión MATERIA
 
 
+<!-- #region -->
 ```python
 # Construir DIM_MATERIA
 data_materia = []
@@ -4234,6 +2807,8 @@ df_dim_materia['materia_id'] = range(1, len(df_dim_materia) + 1)
 
 # MODIFICACIÓN 1: Redondear PROMEDIO_MATERIA
 df_dim_materia['PROMEDIO_MATERIA'] = df_dim_materia['PROMEDIO_MATERIA'].round(2)
+```
+<!-- #endregion -->
 
 **Crea la dimensión DIM_MATERIA con:**
 
@@ -4243,8 +2818,10 @@ df_dim_materia['PROMEDIO_MATERIA'] = df_dim_materia['PROMEDIO_MATERIA'].round(2)
 
 Finalmente, redondea los promedios a 2 decimales.
 
+
 ### 4. Construcción de dimensión ASISTENCIAS
 
+<!-- #region -->
 ```python
 # Construir DIM_ASISTENCIAS
 df_dim_asistencias = df_alumnos[[
@@ -4257,6 +2834,8 @@ df_dim_asistencias = df_dim_asistencias.drop_duplicates()
 df_dim_asistencias['TOTAL_ASISTENCIAS'] = df_dim_asistencias['TOTAL_ASISTENCIAS'].astype(int)
 df_dim_asistencias['TOTAL_INASISTENCIAS'] = df_dim_asistencias['TOTAL_INASISTENCIAS'].astype(int)
 df_dim_asistencias['PORCENTAJE_ASISTENCIA'] = df_dim_asistencias['PORCENTAJE_ASISTENCIA'].round(2)
+```
+<!-- #endregion -->
 
 **Construye la dimensión DIM_ASISTENCIAS** con:
 
@@ -4265,9 +2844,11 @@ df_dim_asistencias['PORCENTAJE_ASISTENCIA'] = df_dim_asistencias['PORCENTAJE_ASI
 - Redondeo del **porcentaje de asistencia** a 2 decimales  
 - Eliminación de **registros duplicados**
 
+
 ### 5. Construcción de tabla de hechos
 
 
+<!-- #region -->
 ```python
 # Construir HECHOS_DEMOGRAFICOS en formato largo
 df_hechos = df_alumnos.melt(
@@ -4285,15 +2866,19 @@ df_hechos['PORCENTAJE'] = df_hechos['PORCENTAJE'].round(2)
 map_materia_id = dict(zip(df_dim_materia['nombre_materia'], df_dim_materia['materia_id']))
 df_hechos['materia_id'] = df_hechos['nombre_materia'].map(map_materia_id)
 df_hechos = df_hechos.drop(columns=['nombre_materia'])
+```
+<!-- #endregion -->
 
 - Transforma los datos a **formato largo** (una fila por estudiante-materia)  
 - Redondea **promedios** y **porcentajes** a 2 decimales  
 - Mapea nombres de materias a **IDs** usando un diccionario  
 - Elimina la columna **redundante** de nombre de materia
 
+
 ### 6. Transformación de tipos de datos
 
 
+<!-- #region -->
 ```python
 # Convertir fecha y booleano
 df_hechos['FECHA_NACIMIENTO'] = pd.to_datetime(
@@ -4308,15 +2893,19 @@ df_hechos['RIESGO_REPROBACION'] = df_hechos['RIESGO_REPROBACION'].astype(int)
 
 # Reemplazar NaN en porcentajes por None
 df_hechos['PORCENTAJE'] = df_hechos['PORCENTAJE'].replace({np.nan: None})
+```
+<!-- #endregion -->
 
 - Convierte **fechas de nacimiento** al formato estándar ISO (YYYY-MM-DD)  
 - Transforma el **riesgo de reprobación** a entero (boolean)  
 - Reemplaza valores **NaN** en porcentajes por **None** para mejor manejo en SQL  
 - Maneja errores en conversión de fechas con el modo **coerce**
 
+
 ### 7. Generación de script SQL
 
 
+<!-- #region -->
 ```python
 # Generar script SQL
 with open('cubo_escolar.sql', 'w', encoding='utf-8') as f:
@@ -4431,6 +3020,8 @@ CREATE TABLE HECHOS_DEMOGRAFICOS (
     f.write("\nSET FOREIGN_KEY_CHECKS=1;")
 
 print("Script SQL generado exitosamente: cubo_escolar.sql")
+```
+<!-- #endregion -->
 
 - Crea 3 tablas: **DIM_MATERIA**, **DIM_ASISTENCIAS** y **HECHOS_DEMOGRAFICOS**  
 - Define relaciones mediante **claves foráneas**  
@@ -4440,10 +3031,11 @@ print("Script SQL generado exitosamente: cubo_escolar.sql")
 - Deshabilita temporalmente las **restricciones de claves foráneas** durante la carga  
 - Genera un archivo **cubo_escolar.sql** con todo el esquema y datos
 
+
 ### 8. Ejecución del código
 
-Todo lo anterior lo integramos dentro de la siguiente celda y la corremos:
 
+Todo lo anterior lo integramos dentro de la siguiente celda y la corremos:
 
 ```python
 import pandas as pd
@@ -4674,14 +3266,14 @@ CREATE TABLE HECHOS_DEMOGRAFICOS (
 print("Script SQL generado exitosamente: cubo_escolar.sql")
 ```
 
-    Script SQL generado exitosamente: cubo_escolar.sql
-    
-
 y comprobamos que el archivo se haya creado exitosamente:
+
 
 <img src = "media\7. Comprobamos.jpg">
 
+
 # Creación de dashboard web interactivo
+
 
 Con tal de visualizar datos de una forma entendible, nos propusimos crear un dashboard web que cumpla los siguientes criterios:
 1. Cuenta con una gráfica de barras
@@ -4707,13 +3299,17 @@ permitiendonos separar cada tipo de código (comunicación con la base de datos,
 
 Esta fase se dividió en las siguientes etapas:
 
+
 ## Creación de `flask_app.py`
 
+
 Para la creación del `flask_app.py` seguimos los siguientes pasos:
+
 
 ### 1. Importaciones y Configuración Inicial
 
 
+<!-- #region -->
 ```python
 from flask import Flask, render_template, request
 from flask_sqlalchemy import SQLAlchemy
@@ -4739,11 +3335,15 @@ app.config['SQLALCHEMY_DATABASE_URI'] = (
 )
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
+```
+<!-- #endregion -->
 
 Importa todas las bibliotecas necesarias y configura la aplicación Flask con la conexión a una base de datos MySQL alojada en PythonAnywhere. Se inicializa SQLAlchemy para la gestión de la base de datos y se definen recursos clave para visualización con Bokeh.
 
+
 ### 2. Ruta Principal del Dashboard
 
+<!-- #region -->
 ```python
 @app.route('/')
 def dashboard():
@@ -4782,12 +3382,16 @@ def dashboard():
         condiciones.append("H.PORCENTAJE IS NOT NULL")
         
         where_clause = "WHERE " + " AND ".join(condiciones) if condiciones else ""
+```
+<!-- #endregion -->
 
 Define la ruta principal `/` que gestiona el dashboard. Recibe parámetros de filtro (`semestre`, `género`, `materia`) desde la URL, obtiene datos para los controles de filtrado y construye dinámicamente cláusulas SQL `WHERE` usando `bindparam` para prevenir inyecciones SQL. Siempre incluye la condición de porcentaje no nulo.
+
 
 ### 3. Consulta para Gráfico de Barras
 
 
+<!-- #region -->
 ```python
         # 1. Gráfico de barras: Promedio por materia, semestre y género
         query_text = f"""
@@ -4811,11 +3415,15 @@ Define la ruta principal `/` que gestiona el dashboard. Recibe parámetros de fi
         
         result1 = db.session.execute(query1, parametros)
         df_barras = pd.DataFrame(result1, columns=['semestre', 'materia_id', 'materia', 'genero', 'promedio'])
+```
+<!-- #endregion -->
 
 Ejecuta una consulta SQL que calcula el promedio de porcentaje agrupado por semestre, materia y género. Los resultados se almacenan en un DataFrame de Pandas para su procesamiento posterior. Utiliza parámetros enlazados para seguridad y manejo de listas variables.
 
+
 ### 4. Construcción del Gráfico de Barras
 
+<!-- #region -->
 ```python
         if not df_barras.empty:
             # ... (procesamiento de datos y mapeo de colores)
@@ -4853,14 +3461,18 @@ Ejecuta una consulta SQL que calcula el promedio de porcentaje agrupado por seme
         else:
             # Crear figura vacía si no hay datos
             p1 = figure(...)
+```
+<!-- #endregion -->
 
 Genera un gráfico de barras horizontales interactivo con Bokeh. Organiza las barras por materia y género, agrupadas por semestre. Incluye separadores visuales entre semestres, etiquetas de semestre y una leyenda interactiva que permite mutear géneros. Maneja casos sin datos mostrando un mensaje.
+
 
 
 
 ### 5. Consulta para Gráfico de Dispersión
 
 
+<!-- #region -->
 ```python
         # 2. Gráfico de dispersión: Promedio vs Asistencia
         query_text2 = f"""
@@ -4880,12 +3492,16 @@ Genera un gráfico de barras horizontales interactivo con Bokeh. Organiza las ba
         
         result2 = db.session.execute(query2, parametros)
         df_disp = pd.DataFrame(result2, columns=['promedio', 'asistencia', 'materia', 'semestre', 'genero'])
+```
+<!-- #endregion -->
 
 Realiza una segunda consulta para obtener datos de promedio versus asistencia. Une tablas de hechos demográficos, asistencias y materias usando la misma cláusula `WHERE` dinámica generada previamente.
+
 
 ### 6. Construcción del Gráfico de Dispersión
 
 
+<!-- #region -->
 ```python
         if not df_disp.empty:
             # ... (preparación de datos y colores)
@@ -4912,12 +3528,16 @@ Realiza una segunda consulta para obtener datos de promedio versus asistencia. U
         else:
             # Mostrar mensaje cuando no hay datos
             p2 = figure(...)
+```
+<!-- #endregion -->
 
 Crea un gráfico de dispersión que relaciona el promedio académico con el porcentaje de asistencia. Los puntos se colorean según el género e incluyen tooltips detallados. La leyenda permite mutear categorías de género interactivamente.
+
 
 ### 7. Renderización de Resultados
 
 
+<!-- #region -->
 ```python
         # Generar componentes Bokeh
         script1, div1 = components(p1)
@@ -4943,12 +3563,16 @@ Crea un gráfico de dispersión que relaciona el promedio académico con el porc
             filtro_genero=generos_filtro,
             filtro_materia=materias_filtro
         )
+```
+<!-- #endregion -->
 
 Convierte los gráficos Bokeh en componentes HTML/JS y prepara los recursos necesarios (CDN). Renderiza la plantilla `dashboard.html` pasando los gráficos, recursos CDN, datos para los filtros y valores actuales seleccionados.
+
 
 ### 8. Funciones Auxiliares
 
 
+<!-- #region -->
 ```python
 def obtener_semestres():
     """Obtener lista de semestres disponibles"""
@@ -4979,14 +3603,18 @@ def obtener_materias_agrupadas():
     
     # ... (agrupamiento por semestre)
     return materias_agrupadas
+```
+<!-- #endregion -->
 
 Funciones que obtienen datos para los controles de filtrado: semestres (incluyendo opción "Todos"), géneros disponibles, y materias organizadas por semestre. Las materias se agrupan en una estructura de diccionario por semestre.
+
 
 
 
 ### 9. Manejo de Errores y Ejecución
 
 
+<!-- #region -->
 ```python
     except Exception as e:
         # Capturar cualquier error y mostrar detalles
@@ -5008,18 +3636,25 @@ Funciones que obtienen datos para los controles de filtrado: semestres (incluyen
 
 if __name__ == '__main__':
     app.run(debug=True)
+```
+<!-- #endregion -->
 
 Captura excepciones mostrando detalles técnicos y sugerencias para resolver errores de conexión a la base de datos. Inicia el servidor Flask en modo debug cuando se ejecuta directamente.
 
 
+
 ###### Para mejor visualización consulte <a href = "anexo\flask_app.py"><i>flask_app.py</i></a>
+
 
 ## Creación del `dashboard.html`
 
+
 Para la creación del `dashboard.html` seguimos los siguientes pasos:
+
 
 ### 1. Estructura Básica del Documento HTML
 
+<!-- #region -->
 ```html
 <!DOCTYPE html>
 <html lang="es">
@@ -5042,14 +3677,18 @@ Para la creación del `dashboard.html` seguimos los siguientes pasos:
     {% endfor %}
 </head>
 <body>
+```
+<!-- #endregion -->
 
 Define la estructura básica del documento HTML con metadatos esenciales. Incluye enlaces a recursos CSS locales y recursos CDN de Bokeh cargados dinámicamente. Configura un favicon personalizado para la aplicación.
+
 
 
 
 ### 2. Selector de Tema y Encabezado
 
 
+<!-- #region -->
 ```html
     <div class="theme-switcher">
         <button class="theme-btn" id="theme-toggle">Modo Oscuro</button>
@@ -5059,13 +3698,17 @@ Define la estructura básica del documento HTML con metadatos esenciales. Incluy
         <div class="header">
             <h1>Dashboard Académico</h1>
         </div>
+```
+<!-- #endregion -->
 
 Muestra un botón para alternar entre modo oscuro y claro en la esquina superior derecha. Incluye un encabezado principal con el título "Dashboard Académico" dentro de un contenedor principal.
+
 
 
 ### 3. Tarjeta de Instrucciones
 
 
+<!-- #region -->
 ```html
         <div class="instruction-card">
             <h3>¿Cómo usar este dashboard?</h3>
@@ -5077,14 +3720,18 @@ Muestra un botón para alternar entre modo oscuro y claro en la esquina superior
                 <li><strong>Modo Oscuro:</strong> Active/desactive con el botón superior derecho.</li>
             </ul>
         </div>
+```
+<!-- #endregion -->
 
 Proporciona una guía de usuario con instrucciones claras sobre cómo interactuar con el dashboard. Utiliza una lista con elementos destacados en negrita para explicar las funcionalidades clave.
+
 
 
 
 ### 4. Formulario de Filtros
 
 
+<!-- #region -->
 ```html
         <form method="GET" class="filtros">
             <div class="filtro-group">
@@ -5133,6 +3780,8 @@ Proporciona una guía de usuario con instrucciones claras sobre cómo interactua
                     </select>
                 </div>
             </div>
+```
+<!-- #endregion -->
 
 Crea un formulario con tres filtros de selección múltiple:
 
@@ -5142,15 +3791,19 @@ Crea un formulario con tres filtros de selección múltiple:
 
 3. Materia: Lista jerárquica agrupada por semestre con opción "Todas las materias"
 
+
 ### 5. Botones de Acción
 
 
+<!-- #region -->
 ```html
             <div class="button-group">
                 <button type="submit">Aplicar Filtros</button>
                 <button type="button" class="reset-btn" id="reset-btn">Reiniciar Filtros</button>
             </div>
         </form>
+```
+<!-- #endregion -->
 
 Añade dos botones de acción:
 
@@ -5158,8 +3811,10 @@ Añade dos botones de acción:
 
 - Reiniciar Filtros: Botón rojo para limpiar todas las selecciones
 
+
 ### 6. Contenedores para Gráficos Bokeh
 
+<!-- #region -->
 ```html
         <div class="grafico">
             <h2>Promedio por Materia y Género</h2>
@@ -5177,6 +3832,8 @@ Añade dos botones de acción:
             {{ script2 | safe }}
         </div>
     </div>
+```
+<!-- #endregion -->
 
 Incrusta los componentes de Bokeh generados por Flask:
 
@@ -5186,23 +3843,32 @@ Incrusta los componentes de Bokeh generados por Flask:
 
 3. Usa `| safe` para renderizar correctamente el HTML generado
 
+
 ### 7. Scripts Finales y Cierre
 
 
+<!-- #region -->
 ```html
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 </html>
+```
+<!-- #endregion -->
 
 Incluye el archivo JavaScript local para funcionalidades interactivas y cierra las etiquetas del documento HTML.
 
+
 ###### Para mejor visualización consulte <a href = "anexo\dashboard.html"><i>dashboard.html</i></a>
+
 
 ## Creación de `styles.css`
 
+
 Para la creación del `styles.css` seguimos los siguientes pasos:
 
+
 ### 1. Variables CSS Globales y Estilos Base
+
 
 ```css
 :root {
@@ -5233,11 +3899,15 @@ body.dark-mode {
     background-color: var(--background-dark);
     color: var(--text-dark);
 }
+```
+
 
 Define variables CSS para colores clave que permiten alternar entre modos claro/oscuro. Configura estilos base para el cuerpo del documento con transiciones suaves para cambios de tema.
 
 
+
 ### 2. Contenedor Principal y Encabezado
+
 
 
 ```css
@@ -5270,10 +3940,14 @@ body.dark-mode .container {
     padding: 10px 0;
     text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
 }
+```
+
 
 Diseña el contenedor principal con dimensiones máximas, sombras y bordes redondeados. El encabezado incluye un borde inferior decorativo con el color primario y un título con efecto de sombra de texto.
 
+
 ### 3. Selector de Tema e Instrucciones
+
 
 
 ```css
@@ -5326,12 +4000,16 @@ body.dark-mode .instruction-card h3 {
 .instruction-card ul {
     padding-left: 20px;
 }
+```
+
 
 Posiciona el botón de cambio de tema en la esquina superior derecha con efectos hover. La tarjeta de instrucciones muestra un borde lateral de acento y cambia completamente de apariencia en modo oscuro.
 
 
 
+
 ### 4. Sistema de Filtros
+
 
 
 ```css
@@ -5403,12 +4081,16 @@ body.dark-mode .filtros select {
 .reset-btn:hover {
     background-color: #c0392b !important;
 }
+```
+
 
 Crea un área de filtros semitransparente con controles de selección múltiple. Los botones tienen efectos interactivos y el botón de reinicio se destaca en rojo. Todos los elementos se adaptan visualmente al modo oscuro.
 
 
 
+
 ### 5. Contenedores de Gráficos
+
 
 
 ```css
@@ -5453,12 +4135,16 @@ body.dark-mode .bokeh-wrapper {
     background-color: #2c3e50;
     border-color: var(--border-dark);
 }
+```
+
 
 Diseña contenedores para gráficos con bordes, relleno y fondo adaptativos. Los títulos de sección incluyen bordes inferiores decorativos. El contenedor Bokeh tiene desplazamiento para gráficos grandes y cambia de fondo en modo oscuro.
 
 
 
+
 ### 6. Componentes Adicionales y Utilidades
+
 
 
 ```css
@@ -5515,20 +4201,27 @@ optgroup option {
     gap: 10px;
     margin-top: 15px;
 }
+```
+
 
 Organiza los filtros en columnas flexibles responsivas. Personaliza grupos de opciones en selects con sangrías y fondos diferenciados. Ajusta el tamaño de fuente de etiquetas en gráficos Bokeh y agrupa botones con espaciado uniforme.
 
 
 
+
 ###### Para mejor visualización consulte <a href = "anexo\styles.css"><i>styles.css</i></a>
+
 
 ## Creación del `script.js`
 
+
 Para la creación del `script.js` seguimos los siguientes pasos:
+
 
 ### 1. Manejo del tema oscuro/claro
 
 
+<!-- #region -->
 ```js
 // Toggle para modo oscuro/claro
 const themeToggle = document.getElementById('theme-toggle');
@@ -5556,63 +4249,88 @@ themeToggle.addEventListener('click', function() {
         localStorage.setItem('theme', 'light');
     }
 });
+```
+<!-- #endregion -->
 
 **Implementa la funcionalidad de alternancia entre modos oscuro y claro.** Verifica la preferencia del sistema y el tema guardado en `localStorage`. Al hacer clic en el botón:
 - **Alterna** la clase `dark-mode` en el cuerpo del documento
 - **Actualiza** el texto del botón según el modo activo
 - **Guarda** la preferencia del usuario en `localStorage` para persistencia
 
+
 ### 2. Reinicio de filtros
 
+<!-- #region -->
 ```js
 // Botón para reiniciar filtros
 document.getElementById('reset-btn').addEventListener('click', function() {
     // Quitar todos los parámetros de la URL
     window.location.href = window.location.pathname;
 });
+```
+<!-- #endregion -->
 
 **Gestiona el reinicio de los filtros del dashboard.** Al hacer clic en el botón de reinicio:
 - **Redirige** al usuario a la URL base sin parámetros de consulta
 - **Elimina** todos los filtros aplicados actualmente
 - **Restaura** la vista inicial del dashboard
 
+
 ###### Para mejor visualización consulte <a href = "anexo\script.js"><i>script.js</i></a>
 
+
 # Implementación de dashboard web interactivo
+
 
 Con tal de poder interactuar con el dashboard desde distintos dispositivos, decidimos crear una webapp con Flask dentro de <a href = "https://www.pythonanywhere.com/"><i>pythonanywhere.com</i></a>.
 
 Para la creación de nuestra webapp, seguimos el siguiente procedimiento:
 
+
 ## 1. Creamos la base de datos
+
 
 <img src = "media\4. DBCreacion.png">
 
+
 ## 2. Cargamos el archivo .sql dentro de nuestros archivos de pythonanywhere.com
+
 
 <img src = "media\4.1 SQL.jpg">
 
+
 ## 3. Cargamos los datos dentro de nuestra base de datos MySQL
+
 
 <img src = "media\4.2 Carga.png">
 
+
 ## 4. Revisamos las tablas que se crearon dentro de la base de datos
+
 
 <img src = "media\4.3 Tables.png">
 
+
 ## 5. Checamos la cantidad de registros dentro de la tabla DIM_ASISTENCIAS, DIM_MATERIAS Y HECHOS_DEMOGRAFICOS
+
 
 <img src = "media\4.4 Asistencias.png">
 
+
 <img src = "media\4.5 Materias.png">
+
 
 <img src = "media\4.6 Datos demograficos.png">
 
+
 ## 6. Creamos nuestra webapp
+
 
 <img src = "media\5. Creamos webapp.png">
 
+
 ## 7. Establecemos la jerarquia de los archivos
+
 
 ```
 /
@@ -5628,54 +4346,80 @@ Para la creación de nuestra webapp, seguimos el siguiente procedimiento:
     └── dashboard.html
 ```
 
+
 <img src = "media\5.2.1 Jerarquia.jpg">
+
 
 <img src = "media\5.2.2 Jerarquia.jpg">
 
+
 <img src = "media\5.2.3 Jerarquia.jpg">
+
 
 <img src = "media\5.2.4 Jerarquia.jpg">
 
+
 <img src = "media\5.2.5 Jerarquia.jpg">
+
 
 <img src = "media\5.2.6 Jerarquia.jpg">
 
+
 ## 8. Instalamos dependencias
+
 
 Instalamos las siguientes dependencias dentro de un entorno virtual `flask, flask_sqlalchemy, sqlalchemy, bokeh` y `pandas`
 
+
 <img src = "media\5.3 Instalamos dependencias.png">
+
 
 posteriormente, también se realiza la instalación de `mysqlclient`
 
+
 <img src = "media\5.3.2 Dependencias.png">
+
 
 ## 9. Subimos el código de nuestra `flask_app.py`
 
+
 <img src = "media\6.1 App.jpg">
+
 
 ## 10. Subimos el código de nuestro `dashboard.html`
 
+
 <img src = "media\6.2 Html.jpg">
+
 
 ## 11. Subimos nuestro `styles.css`
 
+
 <img src = "media\6.3 css.jpg">
+
 
 ## 12. Subimos nuestro `script.js`
 
+
 <img src = "media\6.4 js.jpg">
+
 
 ## 13. Apuntamos la ruta del entorno virtual que usamos, dentro de la configuración de la app
 
+
 <img src = "media\5.6 Configurar entorno virtual.png">
+
 
 ## 12. Observamos el resultado inicial
 
+
 <img src = "media\8. Resultado inicial.jpg">
+
 
 ###### El dashboard se encuentra disponible en: <a><i>https://fedivej259.pythonanywhere.com/</i></a>
 
+
 # Repositorio
+
 
 Almacenamos los archivos fuente de nuestra actividad dentro de: <a><i>https://github.com/acamacho0723/dags-etl-23062025</i></a>
