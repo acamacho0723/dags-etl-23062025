@@ -344,7 +344,7 @@ def dashboard():
             p2.legend.title = "Género"
             
             # Configuración de ejes
-            p2.xaxis.axis_label = "Promedio General"
+            p2.xaxis.axis_label = "Porcentaje"
             p2.yaxis.axis_label = "Porcentaje de Asistencia"
             p2.x_range = Range1d(0, 100)
             p2.y_range = Range1d(0, 100)
