@@ -314,25 +314,20 @@ def dashboard():
             df_disp['color'] = df_disp['genero'].map(color_map_disp)
             
             source_disp = ColumnDataSource(df_disp)
-        else:
-            # Crear dataframe vacío con estructura completa
-            df_disp = pd.DataFrame(columns=['promedio', 'asistencia', 'info', 'color'])
-            source_disp = ColumnDataSource(df_disp)
-        
-        # Herramientas interactivas
-        herramientas_disp = [
-            'pan', 'wheel_zoom', 'box_zoom', 'reset', 'save', 'hover'
-        ]
-        
-        p2 = figure(
-            title="Promedio vs Asistencia",
-            height=500,
-            width=800,
-            tools=herramientas_disp,
-            toolbar_location="above"
-        )
-        
-        if not df_disp.empty:
+            
+            # Herramientas interactivas
+            herramientas_disp = [
+                'pan', 'wheel_zoom', 'box_zoom', 'reset', 'save', 'hover'
+            ]
+            
+            p2 = figure(
+                title="Promedio vs Asistencia",
+                height=500,
+                width=800,
+                tools=herramientas_disp,
+                toolbar_location="above"
+            )
+            
             scatter = p2.scatter(
                 'promedio',
                 'asistencia',
@@ -347,22 +342,41 @@ def dashboard():
             p2.legend.click_policy = "mute"
             p2.legend.location = "top_left"
             p2.legend.title = "Género"
-        
-        # Configuración de ejes
-        p2.xaxis.axis_label = "Promedio General"
-        p2.yaxis.axis_label = "Porcentaje de Asistencia"
-        p2.x_range = Range1d(0, 100)
-        p2.y_range = Range1d(0, 100)
-        p2.xgrid.grid_line_color = None
-        p2.ygrid.grid_line_alpha = 0.3
-        
-        # Configurar hover
-        hover_disp = p2.select_one(HoverTool)
-        hover_disp.tooltips = [
-            ("Materia/Semestre/Género", "@info"),
-            ("Promedio", "@promedio{0.00}"),
-            ("Asistencia", "@asistencia{0.00}%")
-        ]
+            
+            # Configuración de ejes
+            p2.xaxis.axis_label = "Promedio General"
+            p2.yaxis.axis_label = "Porcentaje de Asistencia"
+            p2.x_range = Range1d(0, 100)
+            p2.y_range = Range1d(0, 100)
+            p2.xgrid.grid_line_color = None
+            p2.ygrid.grid_line_alpha = 0.3
+            
+            # Configurar hover
+            hover_disp = p2.select_one(HoverTool)
+            hover_disp.tooltips = [
+                ("Materia/Semestre/Género", "@info"),
+                ("Promedio", "@promedio{0.00}"),
+                ("Asistencia", "@asistencia{0.00}%")
+            ]
+        else:
+            # Mostrar mensaje cuando no hay datos
+            p2 = figure(
+                title="Promedio vs Asistencia",
+                height=500,
+                width=800,
+                toolbar_location=None
+            )
+            p2.xaxis.axis_label = "Promedio General"
+            p2.yaxis.axis_label = "Porcentaje de Asistencia"
+            p2.text(
+                x=[0.5], y=[0.5], 
+                text=["No hay datos disponibles con los filtros seleccionados"],
+                text_align="center", text_baseline="middle",
+                text_font_size="14pt"
+            )
+            # Ajustar rangos para que el texto sea visible
+            p2.x_range = Range1d(0, 1)
+            p2.y_range = Range1d(0, 1)
 
         # Generar componentes Bokeh
         script1, div1 = components(p1)
