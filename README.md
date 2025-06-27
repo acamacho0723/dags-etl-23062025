@@ -404,6 +404,14 @@ print(f"- Muestra XML: data{os.sep}calificaciones{os.sep}calificaciones.xml")
 
 ### 4. Ejecución del generador
 
+###### Cambiamos el directorio de trabajo para poder guardar los archivos dentro de la carpeta `anexo`
+
+
+```python
+import os
+os.chdir(r"anexo")
+```
+
 Integramos todo lo anterior dentro de la siguiente celda y lo ejecutamos:
 
 
@@ -6338,19 +6346,39 @@ El equipo realizó un trabajo en conjunto en cuanto al desarrollo del dashboard 
 
 Programa utilizado - <a href = "anexo\ETL\Generador - Calificaciones.py"><i>Generador - Calificaciones.py</i></a>
 
+Resultados:
+
+1. <a href = "anexo\data\calificaciones\calificaciones.csv"><i>calificaciones.csv</i></a>
+2. <a href = "anexo\data\calificaciones\calificaciones.json"><i>calificaciones.json</i></a>
+3. <a href = "anexo\data\calificaciones\calificaciones.xml"><i>calificaciones.xml</i></a>
+
 ### Dataset de asistencias
 
 Programa utilizado - <a href = "anexo\ETL\Generador - Asistencias.py"><i>Generador - Asistencias.py</i></a>
+
+Resultados:
+
+1. <a href = "anexo\data\asistencia\asistencia.csv"><i>asistencias.csv</i></a>
+2. <a href = "anexo\data\asistencia\asistencia.json"><i>asistencias.json</i></a>
+3. <a href = "anexo\data\asistencia\asistencia.xml"><i>asistencias.xml</i></a>
 
 ### Dataset de datos demográficos
 
 Programa utilizado - <a href = "anexo\ETL\Generador - Datos demograficos.py"><i>Generador - Datos demograficos.py</i></a>
 
-###### El semestre de los alumnos para este último programa fue adquirido de <a href = "anexo\tmp\calificaciones.csv">calificaciones.csv</a>
+Resultados:
+
+1. <a href = "anexo\data\datos_demograficos\datos_demograficos.csv"><i>datos_demograficos.csv</i></a>
+2. <a href = "anexo\data\datos_demograficos\datos_demograficos.json"><i>datos_demograficos.json</i></a>
+3. <a href = "anexo\data\datos_demograficos\datos_demograficos.xml"><i>datos_demograficos.xml</i></a>
+
+###### El semestre de los alumnos para este último programa fue adquirido de <a href = "anexo\tmp\calificaciones.csv"><i>calificaciones.csv</i></a>
 
 ## Unión y cálculo de métricas
 
 Programa utilizado - <a href = "anexo\ETL\extractor.py"><i>extractor.py</i></a>
+
+Resultado - <a href = "anexo\data\consolidado\datos_consolidados.csv"><i>datos_consolidados.csv</i></a>
 
 ### Comprobación
 
@@ -6379,3 +6407,5 @@ Resultado del procedimiento - <a href = "anexo\ETL\cubo_escolar.sql"><i>cubo_esc
 <a href = "anexo\Dashboard\styles.css"><i>styles.css</i></a>
 
 <a href = "anexo\Dashboard\script.js"><i>script.js</i></a>
+
+###### Incluimos los datos para la conexión a nuestra bd en <a href = "anexo\tmp\passwd.txt"><i>passwd.txt</i></a>
