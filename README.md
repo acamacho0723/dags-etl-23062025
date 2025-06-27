@@ -6405,4 +6405,6 @@ Resultado del procedimiento - <a href = "anexo\ETL\cubo_escolar.sql"><i>cubo_esc
 
 <a href = "anexo\Dashboard\script.js"><i>script.js</i></a>
 
+### El dashboard esta disponible en: <a><i>https://fedivej259.pythonanywhere.com/</i></a>
+
 ###### Incluimos los datos para la conexión a nuestra bd en <a href = "anexo\tmp\passwd.txt"><i>passwd.txt</i></a>
