@@ -1,9 +1,0 @@
-Quiero agregar la métrica
-"
-6. Promedio por materia (tomando en cuenta que hay alumnos que no toman algunas materias dado su semestre)
-"
-refiriendome al promedio del puntaje de todos los alumnos dentro de dada materia. Hay poner un identificador para saber que se trata del promedio de dicha materia. Solo debería haber una celda para este dato para cada materia.
-
-También quiero ajustar la métrica de riesgo de reprobación a aquellos que tienen un promedio por debajo de 80.
-
-DAME EL CODIGO COMPLETO CORRECTO SIN OMITIR NI UNA SOLA LINEA DE CODIGO.

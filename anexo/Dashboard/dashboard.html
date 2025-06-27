@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Académico</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-    
-      <link rel="icon" 
-        type="image/png" 
-        href="{{ url_for('static', filename='img/dashboard.png') }}">
-    
+
+    <link rel="icon"
+          type="image/png"
+          href="{{ url_for('static', filename='img/dashboard.png') }}">
+
     <!-- Incluir recursos de Bokeh -->
     {% for css in bokeh_resources['css'] %}
         <link rel="stylesheet" href="{{ css }}">
@@ -22,12 +22,12 @@
     <div class="theme-switcher">
         <button class="theme-btn" id="theme-toggle">Modo Oscuro</button>
     </div>
-    
+
     <div class="container">
         <div class="header">
             <h1>Dashboard Académico</h1>
         </div>
-        
+
         <div class="instruction-card">
             <h3>¿Cómo usar este dashboard?</h3>
             <ul>
@@ -38,37 +38,37 @@
                 <li><strong>Modo Oscuro:</strong> Active/desactive con el botón superior derecho.</li>
             </ul>
         </div>
-        
+
         <form method="GET" class="filtros">
             <div class="filtro-group">
                 <h3>Filtros:</h3>
             </div>
-            
+
             <div class="filtro-row">
                 <div class="filtro-col">
                     <label for="semestre">Semestre:</label>
                     <select name="semestre" multiple size="5">
                         {% for semestre in semestres %}
-                            <option value="{{ semestre }}" 
+                            <option value="{{ semestre }}"
                                 {% if semestre in filtro_semestre %}selected{% endif %}>
                                 {{ semestre }}
                             </option>
                         {% endfor %}
                     </select>
                 </div>
-                
+
                 <div class="filtro-col">
                     <label for="genero">Género:</label>
                     <select name="genero" multiple size="5">
                         {% for genero in generos %}
-                            <option value="{{ genero }}" 
+                            <option value="{{ genero }}"
                                 {% if genero in filtro_genero %}selected{% endif %}>
                                 {{ genero }}
                             </option>
                         {% endfor %}
                     </select>
                 </div>
-                
+
                 <div class="filtro-col">
                     <label for="materia_id">Materia:</label>
                     <select name="materia_id" multiple size="10">
@@ -76,7 +76,7 @@
                         {% for semestre, materias in materias_agrupadas %}
                             <optgroup label="Semestre {{ semestre }}">
                                 {% for id, nombre in materias %}
-                                    <option value="{{ id }}" 
+                                    <option value="{{ id }}"
                                         {% if id|string in filtro_materia %}selected{% endif %}>
                                         {{ nombre }}
                                     </option>
@@ -86,13 +86,13 @@
                     </select>
                 </div>
             </div>
-            
+
             <div class="button-group">
                 <button type="submit">Aplicar Filtros</button>
                 <button type="button" class="reset-btn" id="reset-btn">Reiniciar Filtros</button>
             </div>
         </form>
-        
+
         <div class="grafico">
             <h2>Promedio por Materia y Género</h2>
             <div class="bokeh-wrapper">
@@ -100,7 +100,7 @@
             </div>
             {{ script1 | safe }}
         </div>
-        
+
         <div class="grafico">
             <h2>Promedio vs Asistencia</h2>
             <div class="bokeh-wrapper">
@@ -108,8 +108,46 @@
             </div>
             {{ script2 | safe }}
         </div>
-    </div>
-    
+
+        <!-- Sección de Alumnos en Riesgo (Versión Corregida) -->
+        <div class="grafico">
+            <h2>Alumnos en Riesgo de Reprobación</h2>
+            {% if alumnos_riesgo %}
+            <div class="table-container">
+                <table class="riesgo-table">
+                    <thead>
+                        <tr>
+                            <th>Matrícula</th>
+                            <th>Nombre</th>
+                            <th>Semestre</th>
+                            <th>Materia</th>
+                            <th>Porcentaje</th>
+                            <th>Promedio General</th>
+                            <th>Asistencia</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for alumno in alumnos_riesgo %}
+                        <tr>
+                            <td>{{ alumno.MATRICULA }}</td>
+                            <td>{{ alumno.nombre_completo }}</td>
+                            <td>{{ alumno.SEMESTRE }}</td>
+                            <td>{{ alumno.nombre_materia }}</td>
+                            <td>{{ '%.2f' | format(alumno.porcentaje_materia|float) }}%</td>
+                            <td>{{ '%.2f' | format(alumno.promedio_general|float) }}%</td>
+                            <td>{{ '%.2f' | format(alumno.PORCENTAJE_ASISTENCIA|float) }}%</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p>No se encontraron alumnos en riesgo de reprobación con los filtros seleccionados.</p>
+            {% endif %}
+        </div>
+
+    </div> <!-- Cierre del container -->
+
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 </html>

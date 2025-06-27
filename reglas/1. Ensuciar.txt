@@ -1,5 +1,0 @@
-1. Asistencias: Borrar S o N
-
-2. Calificaciones: Subir número, bajar número.
-
-3. Datos demográficos: Borrar Nombre, Género, Fecha de nacimiento

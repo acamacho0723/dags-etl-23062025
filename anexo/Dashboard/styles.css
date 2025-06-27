@@ -271,3 +271,56 @@ body.dark-mode .bokeh-wrapper {
     gap: 10px;
     margin-top: 15px;
 }
+
+/* ... (estilos existentes) */
+
+/* Estilos para la tabla de riesgo */
+.table-container {
+    overflow-x: auto;
+    margin-top: 20px;
+    border: 1px solid var(--border-light);
+    border-radius: 5px;
+    padding: 10px;
+    background-color: white;
+    transition: all 0.3s;
+}
+
+body.dark-mode .table-container {
+    background-color: #2c3e50;
+    border-color: var(--border-dark);
+}
+
+.riesgo-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.riesgo-table th, .riesgo-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-light);
+}
+
+body.dark-mode .riesgo-table th,
+body.dark-mode .riesgo-table td {
+    border-bottom: 1px solid var(--border-dark);
+}
+
+.riesgo-table th {
+    background-color: var(--primary-color);
+    color: white;
+    font-weight: bold;
+}
+
+body.dark-mode .riesgo-table th {
+    background-color: var(--secondary-color);
+}
+
+.riesgo-table tbody tr:hover {
+    background-color: rgba(52, 152, 219, 0.1);
+}
+
+body.dark-mode .riesgo-table tbody tr:hover {
+    background-color: rgba(41, 128, 185, 0.2);
+}
