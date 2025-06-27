@@ -283,7 +283,6 @@ for idx in registros_ensuciar:
   - Por cada materia seleccionada, se aplica aleatoriamente una de las siguientes operaciones:
     - Multiplicar la nota por 100.
     - Dividir la nota entre 100.
-    - Borrar la nota (establecerla como `NaN`).
 
 <strong>Reemplazo de NaN</strong>
 
