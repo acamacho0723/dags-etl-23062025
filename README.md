@@ -268,9 +268,9 @@ for idx in registros_ensuciar:
 
 - Se identifican las columnas que contienen notas, descartando las columnas `MATRICULA` y `SEMESTRE`.
 
-<strong>Cálculo del 10% de filas a «ensuciar»</strong>
+<strong>Cálculo del 1% de filas a «ensuciar»</strong>
 
-- Se calcula el 10% del total de filas para alterarlas, asegurando un mínimo de 1.
+- Se calcula el 1% del total de filas para alterarlas, asegurando un mínimo de 1.
 
 <strong>Selección aleatoria de índices</strong>
 
