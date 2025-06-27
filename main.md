@@ -2814,7 +2814,7 @@ Para nuestra actividad, decidimos implementar una fase en la que se juntan todos
 
 4. Porcentaje de asistencias.
 
-5. Casilla de riesgo de reprobación (`1` o `0` dependiendo de la asistencia `<70%` y promedio `<6`).
+5. Casilla de riesgo de reprobación (`1` o `0` dependiendo de la asistencia `<70%` y promedio `<8`).
 
 6. Promedio por materia (tomando en cuenta que hay alumnos que no toman algunas materias dado su semestre).
 
