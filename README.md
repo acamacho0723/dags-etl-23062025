@@ -10,11 +10,9 @@ Para la organización de nuestra actividad, hicimos uso de los siguientes elemen
 
 ## User Story Map
 
-<img src = 'media\mi tablero de trello\tablero.png'>
+<img src = 'media\mi tablero de trello\tablero.png'>|
 
-<img src = 'media\mi tablero de trello\1.1.png'>
-
-<img src = 'media\mi tablero de trello\1.15.png'>
+<img src = 'media\Capturas Sprint Backlog\2.1.png'>
 
 <img src = 'media\mi tablero de trello\1.2.png' >
 
