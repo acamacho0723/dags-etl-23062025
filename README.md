@@ -10,11 +10,9 @@ Para la organización de nuestra actividad, hicimos uso de los siguientes elemen
 
 ## User Story Map
 
-<img src = 'media\mi tablero de trello\tablero.png'>
+<img src = 'media\mi tablero de trello\tablero.png'>|
 
-<img src = 'media\mi tablero de trello\1.1.png'>
-
-<img src = 'media\mi tablero de trello\1.15.png'>
+<img src = 'media\Capturas Sprint Backlog\2.1.png'>
 
 <img src = 'media\mi tablero de trello\1.2.png' >
 
@@ -274,9 +272,9 @@ for idx in registros_ensuciar:
 
 - Se identifican las columnas que contienen notas, descartando las columnas `MATRICULA` y `SEMESTRE`.
 
-<strong>Cálculo del 10% de filas a «ensuciar»</strong>
+<strong>Cálculo del 1% de filas a «ensuciar»</strong>
 
-- Se calcula el 10% del total de filas para alterarlas, asegurando un mínimo de 1.
+- Se calcula el 1% del total de filas para alterarlas, asegurando un mínimo de 1.
 
 <strong>Selección aleatoria de índices</strong>
 
@@ -289,7 +287,6 @@ for idx in registros_ensuciar:
   - Por cada materia seleccionada, se aplica aleatoriamente una de las siguientes operaciones:
     - Multiplicar la nota por 100.
     - Dividir la nota entre 100.
-    - Borrar la nota (establecerla como `NaN`).
 
 <strong>Reemplazo de NaN</strong>
 
@@ -407,6 +404,14 @@ print(f"- Muestra XML: data{os.sep}calificaciones{os.sep}calificaciones.xml")
   - El archivo se guarda en `data/calificaciones/calificaciones.xml`.
 
 ### 4. Ejecución del generador
+
+###### Cambiamos el directorio de trabajo para poder guardar los archivos dentro de la carpeta `anexo`
+
+
+```python
+import os
+os.chdir(r"anexo")
+```
 
 Integramos todo lo anterior dentro de la siguiente celda y lo ejecutamos:
 
@@ -2813,7 +2818,7 @@ Para nuestra actividad, decidimos implementar una fase en la que se juntan todos
 
 4. Porcentaje de asistencias.
 
-5. Casilla de riesgo de reprobación (`1` o `0` dependiendo de la asistencia `<70%` y promedio `<6`).
+5. Casilla de riesgo de reprobación (`1` o `0` dependiendo de la asistencia `<70%` y promedio `<8`).
 
 6. Promedio por materia (tomando en cuenta que hay alumnos que no toman algunas materias dado su semestre).
 
@@ -4747,8 +4752,7 @@ Esta fase se dividió en las siguientes etapas:
 
 Para la creación del `flask_app.py` seguimos los siguientes pasos:
 
-### 1. Importaciones y Configuración Inicial
-
+### 1. Importación de librerías
 
 ```python
 from flask import Flask, render_template, request
@@ -4763,7 +4767,32 @@ import pandas as pd
 import numpy as np
 from collections import defaultdict
 import math
+```
 
+Este bloque importa todas las dependencias necesarias:
+
+- **Flask** y **Flask‑SQLAlchemy**:  
+  Para crear la aplicación web y el ORM.
+
+- **`sqlalchemy.text`** y **`bindparam`**:  
+  Para construir consultas SQL con parámetros vinculados.
+
+- **Bokeh**:  
+  Para generar gráficos interactivos.  
+  - `figure`: crear la figura.  
+  - `components`: embeber los scripts en la plantilla.  
+  - `CDN`: referenciar recursos vía CDN.  
+  - Modelos de interacción: `HoverTool`, `ColumnDataSource`, `Range1d`, `Legend`, `LegendItem`, `Span`, etc.
+
+- **Pandas** y **NumPy**:  
+  Para manipular los resultados de las consultas en estructuras tabulares y numéricas.
+
+- **`collections.defaultdict`** y **`math`**:  
+  Utilidades de Python para conteos por defecto y cálculos matemáticos.
+
+### 2. Inicialización de la aplicación y configuración de la base de datos
+
+```python
 app = Flask(__name__)
 
 # Configuración de la base de datos
@@ -4777,9 +4806,22 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 ```
 
-Importa todas las bibliotecas necesarias y configura la aplicación Flask con la conexión a una base de datos MySQL alojada en PythonAnywhere. Se inicializa SQLAlchemy para la gestión de la base de datos y se definen recursos clave para visualización con Bokeh.
+- **`app = Flask(__name__)`**  
+  Crea la instancia principal de la aplicación Flask.
 
-### 2. Ruta Principal del Dashboard
+- **URI de conexión a MySQL en PythonAnywhere**  
+  - **Usuario**: `fedivej259`  
+  - **Contraseña**: `24062025_`  
+  - **Host**: `fedivej259.mysql.pythonanywhere-services.com`  
+  - **Base de datos**: `fedivej259$cubo`
+
+- **`TRACK_MODIFICATIONS = False`**  
+  Desactiva el seguimiento de modificaciones de SQLAlchemy para optimizar el rendimiento.
+
+- **`db = SQLAlchemy(app)`**  
+  Asocia la configuración de la aplicación con el objeto ORM.
+
+### 3. Ruta principal / y manejo de filtros
 
 ```python
 @app.route('/')
@@ -4799,37 +4841,51 @@ def dashboard():
         condiciones = []
         parametros = {}
         bind_params = []
-        
+
         if semestres_filtro and 'Todos' not in semestres_filtro:
             condiciones.append("H.SEMESTRE IN :semestres")
             parametros['semestres'] = tuple(semestres_filtro)
             bind_params.append(bindparam('semestres', expanding=True))
-            
+
         if generos_filtro and 'Todos' not in generos_filtro:
             condiciones.append("H.GENERO IN :generos")
             parametros['generos'] = tuple(generos_filtro)
             bind_params.append(bindparam('generos', expanding=True))
-            
+
         if materias_filtro and '0' not in materias_filtro:
             condiciones.append("H.materia_id IN :materias")
             parametros['materias'] = tuple(map(int, materias_filtro))
             bind_params.append(bindparam('materias', expanding=True))
-            
+
         # Agregar condición fija para PORCENTAJE no nulo
         condiciones.append("H.PORCENTAJE IS NOT NULL")
-        
+
         where_clause = "WHERE " + " AND ".join(condiciones) if condiciones else ""
 ```
 
-Define la ruta principal `/` que gestiona el dashboard. Recibe parámetros de filtro (`semestre`, `género`, `materia`) desde la URL, obtiene datos para los controles de filtrado y construye dinámicamente cláusulas SQL `WHERE` usando `bindparam` para prevenir inyecciones SQL. Siempre incluye la condición de porcentaje no nulo.
+- **Definición de la vista `dashboard()`**  
+  Responde a la ruta `/`.
 
-### 3. Consulta para Gráfico de Barras
+- **Lectura de filtros**  
+  Usa `request.args.getlist()` para capturar semestres, géneros y materias seleccionadas en la URL.
 
+- **Invocación de funciones auxiliares**  
+  - `obtener_semestres()`  
+  - `obtener_generos()`  
+  - `obtener_materias_agrupadas()`  
+  Estas funciones pueblan los controles de filtro.
+
+- **Construcción dinámica de la cláusula `WHERE`**  
+  Genera la condición y los parámetros para las tres dimensiones de filtrado, empleando `bindparam(..., expanding=True)` para listas SQL `IN`.
+
+- **Exclusión de registros nulos**  
+  Siempre añade la condición `H.PORCENTAJE IS NOT NULL` para omitir filas sin valor.
+
+### 4. Consulta y gráfico de barras: “Promedio por Materia y Género”
 
 ```python
-        # 1. Gráfico de barras: Promedio por materia, semestre y género
         query_text = f"""
-            SELECT 
+            SELECT
                 H.SEMESTRE,
                 M.materia_id,
                 M.nombre_materia,
@@ -4841,70 +4897,179 @@ Define la ruta principal `/` que gestiona el dashboard. Recibe parámetros de fi
             GROUP BY H.SEMESTRE, M.materia_id, M.nombre_materia, H.GENERO
             ORDER BY H.SEMESTRE, M.nombre_materia, H.GENERO
         """
-        
+
         # Crear objeto text con bindparams para expansión
         query1 = text(query_text)
         if bind_params:
             query1 = query1.bindparams(*bind_params)
-        
+
         result1 = db.session.execute(query1, parametros)
         df_barras = pd.DataFrame(result1, columns=['semestre', 'materia_id', 'materia', 'genero', 'promedio'])
 ```
 
-Ejecuta una consulta SQL que calcula el promedio de porcentaje agrupado por semestre, materia y género. Los resultados se almacenan en un DataFrame de Pandas para su procesamiento posterior. Utiliza parámetros enlazados para seguridad y manejo de listas variables.
+- **Define la consulta SQL** que calcula, para cada semestre, materia y género, el promedio de la columna `H.PORCENTAJE`.
 
-### 4. Construcción del Gráfico de Barras
+- **Usa `text()` de SQLAlchemy** para manejar la expansión de parámetros.
+
+- **Ejecuta la consulta con** `db.session.execute()`, obteniendo un cursor que se carga en un DataFrame de pandas llamado `df_barras`.
+
+### 5. Preparación de datos y creación del gráfico de barras horizontales
 
 ```python
+        # Depuración: Verificar datos obtenidos
+        print(f"Registros obtenidos para gráfico de barras: {len(df_barras)}")
+        print(df_barras.head())
+
         if not df_barras.empty:
-            # ... (procesamiento de datos y mapeo de colores)
-            
+            df_barras['promedio'] = df_barras['promedio'].astype(float)
+            df_barras['semestre'] = df_barras['semestre'].astype(str)
+            df_barras = df_barras.sort_values(['semestre', 'materia'])
+
+            # Preparar datos para gráfica de barras horizontales
+            data = { 'materia_genero': [], 'semestre': [], 'promedio': [],
+                     'genero': [], 'color': [], 'semestre_label': [] }
+            color_map = {'F': Category10[3][0], 'M': Category10[3][1]}
+            current_semestre = None
+            barras_por_semestre = defaultdict(int)
+
+            for idx, row in df_barras.iterrows():
+                materia_gen = f"{row['materia']} - {row['genero']}"
+                if row['semestre'] != current_semestre:
+                    current_semestre = row['semestre']
+                data['materia_genero'].append(materia_gen)
+                data['semestre'].append(row['semestre'])
+                data['promedio'].append(row['promedio'])
+                data['genero'].append(row['genero'])
+                data['color'].append(color_map[row['genero']])
+                data['semestre_label'].append('')
+                barras_por_semestre[row['semestre']] += 1
+
             source_barras = ColumnDataSource(data)
-            
-            # Crear figura con barras HORIZONTALES
+            herramientas_barras = ['pan', 'wheel_zoom', 'box_zoom', 'reset', 'save', 'hover']
             p1 = figure(
                 y_range=data['materia_genero'],
                 x_range=Range1d(0, 120),
                 title="Promedio por Materia y Género",
-                height=800,
-                width=1000,
+                height=800, width=1000,
                 tools=herramientas_barras,
                 toolbar_location="above",
                 y_axis_label="Materia y Género",
                 x_axis_label="Promedio (%)"
             )
-            
-            # ... (configuración de ejes, hover y leyenda)
-            
-            # Añadir separadores de semestre y etiquetas
-            for i, (semestre, position) in enumerate(semestre_positions.items()):
-                # ... (cálculo de posiciones)
-                if i < len(semestre_positions) - 1:
-                    separator = Span(...)
-                    p1.add_layout(separator)
-                
-                p1.text(
-                    x=105,
-                    y=center_pos,
-                    text=[f"S{semestre}"],
-                    # ... (estilo de texto)
-                )
-        else:
-            # Crear figura vacía si no hay datos
-            p1 = figure(...)
+            p1.hbar(
+                y='materia_genero', right='promedio', height=0.7,
+                source=source_barras, fill_color='color',
+                line_color='darkgrey', alpha=0.9, name='genero', muted_alpha=0.1
+            )
+            hover_barras = p1.select_one(HoverTool)
+            hover_barras.tooltips = [("Materia", "@materia_genero"),
+                                     ("Semestre", "@semestre"),
+                                     ("Promedio", "@promedio{0.00}%")]
+            hover_barras.mode = 'mouse'
 ```
 
-Genera un gráfico de barras horizontales interactivo con Bokeh. Organiza las barras por materia y género, agrupadas por semestre. Incluye separadores visuales entre semestres, etiquetas de semestre y una leyenda interactiva que permite mutear géneros. Maneja casos sin datos mostrando un mensaje.
+- **Depuración**:  
+  - Imprime en consola cuántos registros se obtuvieron.  
+  - Muestra un vistazo de los datos con `.head()`.
 
+- **Conversión de tipos**:  
+  - Convierte `promedio` a `float`.  
+  - Convierte `semestre` a `str`.
 
+- **Ordenación**:  
+  - Ordena el DataFrame por `semestre` y `materia`.
 
-### 5. Consulta para Gráfico de Dispersión
+- **Construcción del diccionario `data`**:  
+  - Inicializa listas vacías.  
+  - Recorre cada fila de `df_barras` y llena el diccionario.
 
+- **Asignación de colores**:  
+  - Usa la paleta `Category10` para asignar colores distintos a cada `género`.
+
+- **Creación de la fuente de datos y figura**:  
+  - Crea un `ColumnDataSource` de Bokeh.  
+  - Define la figura `p1` con barras horizontales (`hbar`).
+
+- **Configuración de la herramienta de hover**:  
+  - Muestra `materia`, `semestre` y `promedio` con formato al pasar el cursor.
+
+### 6. Leyenda, separadores y etiquetas de semestres en el gráfico de barras
+
+```python
+            # Corrección de leyenda
+            legend_items = []
+            generos_presentes = set(data['genero'])
+            for genero in generos_presentes:
+                r_legend = p1.square(
+                    x=[-100], y=[-100], size=15,
+                    fill_color=color_map[genero], line_color='black',
+                    alpha=1.0, name=f'legend_{genero}'
+                )
+                r_legend.visible = False
+                legend_items.append(LegendItem(label=genero, renderers=[r_legend]))
+            legend = Legend(items=legend_items, location="top_right", click_policy="mute")
+            p1.add_layout(legend, 'right')
+
+            # Cálculo de posiciones para separadores
+            acumulado = 0
+            semestre_ranges = {}
+            semestres_ordenados = []
+            seen = set()
+            for sem in reversed(data['semestre']):
+                if sem not in seen:
+                    seen.add(sem)
+                    semestres_ordenados.insert(0, sem)
+            ESPACIO_ENTRE_SEMESTRES = 1.0
+            for semestre in semestres_ordenados:
+                num_barras = barras_por_semestre[semestre]
+                start_pos = acumulado
+                end_pos = acumulado + num_barras - 1
+                semestre_ranges[semestre] = (start_pos, end_pos)
+                acumulado = end_pos + ESPACIO_ENTRE_SEMESTRES + 0.5
+
+            SEPARATOR_ADJUST = 0.2
+            semestre_items = list(semestre_ranges.items())
+            for i, (semestre, (start_pos, end_pos)) in enumerate(semestre_items):
+                if i < len(semestre_items) - 1:
+                    next_start = semestre_items[i+1][1][0]
+                    base_pos   = (end_pos + next_start) / 2
+                    separator_pos = base_pos + ( -0.2 if i == 1 else +0.2 )
+                    separator = Span(
+                        location=separator_pos, dimension='width',
+                        line_color='black', line_width=1.5, line_dash='dashed'
+                    )
+                    p1.add_layout(separator)
+                center_pos = (start_pos + end_pos) / 2
+                p1.text(
+                    x=105, y=center_pos, text=[f"S{semestre}"],
+                    text_font_size="12pt", text_font_style="bold",
+                    text_color="navy", text_align="left", text_baseline="middle"
+                )
+
+            p1.xgrid.grid_line_color = None
+            p1.x_range.start = 0
+            p1.ygrid.grid_line_color = None
+            p1.min_border_left = 300
+```
+
+- **Crea una leyenda interactiva**:  
+  Dibuja cuadrados invisibles solo para la leyenda y permite mutear un género al hacer clic.
+
+- **Calcula rangos por semestre**:  
+  Determina `start_pos` y `end_pos` y añade separadores (`Span`) con líneas punteadas entre cada grupo de barras de distinto semestre.
+
+- **Añade etiquetas de texto**:  
+  Utiliza `p1.text` para colocar a la derecha de la gráfica etiquetas con el formato “S<semestre>”.
+
+- **Ajusta estética**:  
+  Modifica las líneas de cuadrícula y los márgenes para mejorar la apariencia general.
+
+### 7. Gráfico de dispersión: “Promedio vs Asistencia”
 
 ```python
         # 2. Gráfico de dispersión: Promedio vs Asistencia
         query_text2 = f"""
-            SELECT H.PORCENTAJE AS promedio, A.PORCENTAJE_ASISTENCIA, 
+            SELECT H.PORCENTAJE AS promedio, A.PORCENTAJE_ASISTENCIA,
                    M.nombre_materia, H.SEMESTRE, H.GENERO
             FROM HECHOS_DEMOGRAFICOS H
             JOIN DIM_ASISTENCIAS A
@@ -4913,78 +5078,67 @@ Genera un gráfico de barras horizontales interactivo con Bokeh. Organiza las ba
             JOIN DIM_MATERIA M ON H.materia_id = M.materia_id
             {where_clause}
         """
-        
         query2 = text(query_text2)
         if bind_params:
             query2 = query2.bindparams(*bind_params)
-        
         result2 = db.session.execute(query2, parametros)
         df_disp = pd.DataFrame(result2, columns=['promedio', 'asistencia', 'materia', 'semestre', 'genero'])
-```
 
-Realiza una segunda consulta para obtener datos de promedio versus asistencia. Une tablas de hechos demográficos, asistencias y materias usando la misma cláusula `WHERE` dinámica generada previamente.
+        # Depuración
+        print(f"Registros obtenidos para gráfico de dispersión: {len(df_disp)}")
+        print(df_disp.head())
 
-### 6. Construcción del Gráfico de Dispersión
-
-
-```python
         if not df_disp.empty:
-            # ... (preparación de datos y colores)
-            
+            df_disp['promedio'] = df_disp['promedio'].astype(float)
+            df_disp['asistencia'] = df_disp['asistencia'].astype(float)
+            df_disp['info'] = df_disp.apply(
+                lambda row: f"{row['materia']} - S{row['semestre']} - {row['genero']}",
+                axis=1
+            )
+            color_map_disp = {'F': Category10[3][0], 'M': Category10[3][1]}
+            df_disp['color'] = df_disp['genero'].map(color_map_disp)
+            source_disp = ColumnDataSource(df_disp)
+            herramientas_disp = ['pan', 'wheel_zoom', 'box_zoom', 'reset', 'save', 'hover']
             p2 = figure(
                 title="Promedio vs Asistencia",
-                height=500,
-                width=800,
+                height=500, width=800,
                 tools=herramientas_disp,
                 toolbar_location="above"
             )
-            
-            scatter = p2.scatter(
-                'promedio',
-                'asistencia',
-                size=10,
-                alpha=0.6,
-                color='color',
-                source=source_disp,
-                legend_field='genero'
+            p2.scatter(
+                'promedio', 'asistencia', size=10, alpha=0.6,
+                color='color', source=source_disp, legend_field='genero'
             )
-            
-            # ... (configuración de ejes, hover y leyenda interactiva)
+            p2.legend.click_policy = "mute"
+            p2.legend.location = "top_left"
+            p2.legend.title = "Género"
+            p2.xaxis.axis_label = "Porcentaje"
+            p2.yaxis.axis_label = "Porcentaje de Asistencia"
+            p2.x_range = Range1d(0, 100)
+            p2.y_range = Range1d(0, 100)
+            p2.xgrid.grid_line_color = None
+            p2.ygrid.grid_line_alpha = 0.3
+            hover_disp = p2.select_one(HoverTool)
+            hover_disp.tooltips = [
+                ("Materia/Semestre/Género", "@info"),
+                ("Promedio", "@promedio{0.00}"),
+                ("Asistencia", "@asistencia{0.00}%")
+            ]
         else:
-            # Mostrar mensaje cuando no hay datos
-            p2 = figure(...)
-```
-
-Crea un gráfico de dispersión que relaciona el promedio académico con el porcentaje de asistencia. Los puntos se colorean según el género e incluyen tooltips detallados. La leyenda permite mutear categorías de género interactivamente.
-
-### 7. Renderización de Resultados
-
-
-```python
-        # Generar componentes Bokeh
-        script1, div1 = components(p1)
-        script2, div2 = components(p2)
-        
-        # Obtener recursos CDN
-        bokeh_resources = {
-            'js': CDN.js_files,
-            'css': CDN.css_files
-        }
-
-        return render_template(
-            'dashboard.html',
-            script1=script1, 
-            div1=div1,
-            script2=script2, 
-            div2=div2,
-            bokeh_resources=bokeh_resources,
-            semestres=semestres,
-            generos=generos,
-            materias_agrupadas=materias_agrupadas,
-            filtro_semestre=semestres_filtro,
-            filtro_genero=generos_filtro,
-            filtro_materia=materias_filtro
-        )
+            p2 = figure(
+                title="Promedio vs Asistencia", height=500, width=800,
+                toolbar_location=None
+            )
+            p2.xaxis.axis_label = "Promedio General"
+            p2.yaxis.axis_label = "Porcentaje de Asistencia"
+            p2.text(
+                x=[0.5], y=[0.5],
+                text=["No hay datos disponibles con los filtros seleccionados"],
+                text_align="center", text_baseline="middle",
+                text_font_size="14pt"
+            )
+            p2.x_range = Range1d(0, 1)
+            p2.y_range = Range1d(0, 1)
 ```
 
 Convierte los gráficos Bokeh en componentes HTML/JS y prepara los recursos necesarios (CDN). Renderiza la plantilla `dashboard.html` pasando los gráficos, recursos CDN, datos para los filtros y valores actuales seleccionados.
@@ -5024,16 +5178,117 @@ def obtener_materias_agrupadas():
     return materias_agrupadas
 ```
 
-Funciones que obtienen datos para los controles de filtrado: semestres (incluyendo opción "Todos"), géneros disponibles, y materias organizadas por semestre. Las materias se agrupan en una estructura de diccionario por semestre.
+- **Segunda consulta**:  
+  Une hechos demográficos con asistencias para obtener pares `(promedio académico, porcentaje de asistencia)`.
 
+- **Generación de `df_disp`**:  
+  - Aplica conversiones de tipo (`float`, `str`, etc.).  
+  - Crea una columna de texto para el tooltip.  
+  - Mapea colores según el `género`.
 
+- **Creación de la figura `p2`**:  
+  - Genera un scatter plot con puntos coloreados por género.  
+  - Añade una leyenda interactiva para mutear géneros al hacer clic.
 
-### 9. Manejo de Errores y Ejecución
+- **Manejo de ausencia de datos**:  
+  Si `df_disp` está vacío, dibuja un mensaje centrado en la gráfica.
 
+### 8. Tabla de “Alumnos en riesgo de reprobación”
+
+```python
+        # 3. Consulta para alumnos en riesgo de reprobación
+        query_text3 = f"""
+            SELECT
+                H.MATRICULA,
+                CONCAT(H.NOMBRE, ' ', H.APELLIDO_PATERNO, ' ', H.APELLIDO_MATERNO) AS nombre_completo,
+                H.SEMESTRE,
+                M.nombre_materia,
+                H.PORCENTAJE AS porcentaje_materia,  # Nombre cambiado
+                H.PROMEDIO AS promedio_general,     # Nueva columna
+                A.PORCENTAJE_ASISTENCIA,
+                H.RIESGO_REPROBACION
+            FROM HECHOS_DEMOGRAFICOS H
+            JOIN DIM_MATERIA M ON H.materia_id = M.materia_id
+            JOIN DIM_ASISTENCIAS A
+                ON H.MATRICULA = A.MATRICULA
+                AND H.SEMESTRE = A.SEMESTRE
+            {where_clause}
+            AND H.RIESGO_REPROBACION = 1
+            ORDER BY H.PROMEDIO ASC, A.PORCENTAJE_ASISTENCIA ASC
+        """
+        query3 = text(query_text3)
+        if bind_params:
+            query3 = query3.bindparams(*bind_params)
+        result3 = db.session.execute(query3, parametros)
+        alumnos_riesgo = [row._asdict() for row in result3]
+
+        print(f"Registros obtenidos para alumnos en riesgo: {len(alumnos_riesgo)}")
+```
+
+- **Tercera consulta**:  
+  Selecciona alumnos con `RIESGO_REPROBACION = 1`.
+
+- **Construcción de la lista `alumnos_riesgo`**:  
+  - Para cada alumno en riesgo, crea un diccionario con:  
+    - `matrícula`  
+    - `nombre_completo`  
+    - `materia`  
+    - `porcentaje_académico`  
+    - `porcentaje_asistencia`  
+    - Otros datos relevantes
+
+- **Presentación**:  
+  Muestra `alumnos_riesgo` en la plantilla como una tabla.
+
+### 9. Embeber componentes Bokeh y renderizar plantilla
+
+```python
+        # Generar componentes Bokeh
+        script1, div1 = components(p1)
+        script2, div2 = components(p2)
+
+        # Obtener recursos CDN
+        bokeh_resources = {
+            'js': CDN.js_files,
+            'css': CDN.css_files
+        }
+
+        return render_template(
+            'dashboard.html',
+            script1=script1,
+            div1=div1,
+            script2=script2,
+            div2=div2,
+            bokeh_resources=bokeh_resources,
+            semestres=semestres,
+            generos=generos,
+            materias_agrupadas=materias_agrupadas,
+            filtro_semestre=semestres_filtro,
+            filtro_genero=generos_filtro,
+            filtro_materia=materias_filtro,
+            alumnos_riesgo=alumnos_riesgo
+        )
+
+```
+
+- **`components(pX)`**  
+  Genera el script JavaScript y el div HTML para cada gráfico.
+
+- **Rutas de recursos de Bokeh**  
+  Se reúnen las URLs de los archivos JS y CSS desde el CDN.
+
+- **Renderizado de la plantilla**  
+  Se llama a `render_template()` pasando:  
+  - Filtros seleccionados  
+  - Listas de opciones (semestres, géneros, materias)  
+  - Scripts y divs de los gráficos  
+  - Tabla de `alumnos_riesgo`  
+  para la plantilla `dashboard.html`.
+
+### 10. Manejo de excepciones
 
 ```python
     except Exception as e:
-        # Capturar cualquier error y mostrar detalles
         import traceback
         error_message = f"Error: {str(e)}\n\n{traceback.format_exc()}"
         print(error_message)
@@ -5050,12 +5305,81 @@ Funciones que obtienen datos para los controles de filtrado: semestres (incluyen
         </ul>
         """
 
+```
+
+- **Captura de excepciones**  
+  Cualquier excepción dentro de `dashboard()` es capturada.
+
+- **Impresión de la traza**  
+  Se imprime la traza completa en consola.
+
+- **Mensaje de error en el navegador**  
+  Se muestra un mensaje de error detallado con sugerencias para revisar credenciales y permisos.
+
+### 11. Funciones auxiliares para filtros
+
+```python
+def obtener_semestres():
+    """Obtener lista de semestres disponibles"""
+    query = text("SELECT DISTINCT SEMESTRE FROM HECHOS_DEMOGRAFICOS ORDER BY SEMESTRE DESC")
+    result = db.session.execute(query)
+    return ['Todos'] + [str(row[0]) for row in result]
+
+def obtener_generos():
+    """Obtener lista de géneros disponibles"""
+    query = text("SELECT DISTINCT GENERO FROM HECHOS_DEMOGRAFICOS")
+    result = db.session.execute(query)
+    return ['Todos'] + [row[0] for row in result]
+
+def obtener_materias_agrupadas():
+    """Obtener lista de materias disponibles agrupadas por semestre"""
+    query = text("""
+        SELECT
+            H.SEMESTRE,
+            M.materia_id,
+            M.nombre_materia
+        FROM HECHOS_DEMOGRAFICOS H
+        JOIN DIM_MATERIA M ON H.materia_id = M.materia_id
+        WHERE H.PORCENTAJE IS NOT NULL
+        GROUP BY H.SEMESTRE, M.materia_id, M.nombre_materia
+        ORDER BY H.SEMESTRE DESC, M.nombre_materia
+    """)
+    result = db.session.execute(query)
+
+    materias_por_semestre = {}
+    for row in result:
+        semestre = str(row.SEMESTRE)
+        if semestre not in materias_por_semestre:
+            materias_por_semestre[semestre] = []
+        materias_por_semestre[semestre].append((row.materia_id, row.nombre_materia))
+
+    materias_agrupadas = [
+        (semestre, materias_por_semestre[semestre])
+        for semestre in sorted(materias_por_semestre.keys(), key=lambda s: int(s), reverse=True)
+    ]
+
+    return materias_agrupadas
+
+```
+
+- **`obtener_semestres()`**:  
+  Devuelve la lista `['Todos', '5', '4', ...]` con los semestres disponibles.
+
+- **`obtener_generos()`**:  
+  Devuelve `['Todos', 'F', 'M', ...]`.
+
+- **`obtener_materias_agrupadas()`**:  
+  Agrupa materias por semestre para poblar un menú anidado en la plantilla.
+
+### 12. Ejecución de la aplicación
+
+```python
 if __name__ == '__main__':
     app.run(debug=True)
 ```
 
-Captura excepciones mostrando detalles técnicos y sugerencias para resolver errores de conexión a la base de datos. Inicia el servidor Flask en modo debug cuando se ejecuta directamente.
-
+- **Arranca el servidor de desarrollo de Flask en modo debug**:  
+  Recarga automáticamente ante cambios y muestra la consola de errores.
 
 ###### Para mejor visualización consulte <a href = "anexo\flask_app.py"><i>flask_app.py</i></a>
 
@@ -5063,7 +5387,7 @@ Captura excepciones mostrando detalles técnicos y sugerencias para resolver err
 
 Para la creación del `dashboard.html` seguimos los siguientes pasos:
 
-### 1. Estructura Básica del Documento HTML
+### 1. Estructura del Documento HTML y Metadatos
 
 ```html
 <!DOCTYPE html>
@@ -5073,11 +5397,11 @@ Para la creación del `dashboard.html` seguimos los siguientes pasos:
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Académico</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-    
-      <link rel="icon" 
-        type="image/png" 
-        href="{{ url_for('static', filename='img/dashboard.png') }}">
-    
+
+    <link rel="icon"
+          type="image/png"
+          href="{{ url_for('static', filename='img/dashboard.png') }}">
+
     <!-- Incluir recursos de Bokeh -->
     {% for css in bokeh_resources['css'] %}
         <link rel="stylesheet" href="{{ css }}">
@@ -5089,29 +5413,40 @@ Para la creación del `dashboard.html` seguimos los siguientes pasos:
 <body>
 ```
 
-Define la estructura básica del documento HTML con metadatos esenciales. Incluye enlaces a recursos CSS locales y recursos CDN de Bokeh cargados dinámicamente. Configura un favicon personalizado para la aplicación.
+- **Declaración de tipo de documento HTML5** y atributo `lang="es"`.
 
+- **En `<head>`**:  
+  - Metadatos de codificación y viewport.  
+  - Título de la página.  
+  - Vínculo a la hoja de estilos `styles.css`.  
+  - Definición de un favicon.  
+  - Inclusión dinámica de los archivos CSS y JS de Bokeh.  
 
-
-### 2. Selector de Tema y Encabezado
-
+### 2. Conmutador de Tema
 
 ```html
     <div class="theme-switcher">
         <button class="theme-btn" id="theme-toggle">Modo Oscuro</button>
     </div>
-    
+```
+
+- **Botón para alternar entre modo claro y oscuro**:  
+  La funcionalidad se define en `script.js`.  
+
+### 3. Encabezado Principal
+
+```html
     <div class="container">
         <div class="header">
             <h1>Dashboard Académico</h1>
         </div>
 ```
 
-Muestra un botón para alternar entre modo oscuro y claro en la esquina superior derecha. Incluye un encabezado principal con el título "Dashboard Académico" dentro de un contenedor principal.
+- **Contenedor principal de la página**.
 
+- **Sección de encabezado** con el título del dashboard.  
 
-### 3. Tarjeta de Instrucciones
-
+### 4. Tarjeta de Instrucciones
 
 ```html
         <div class="instruction-card">
@@ -5126,44 +5461,41 @@ Muestra un botón para alternar entre modo oscuro y claro en la esquina superior
         </div>
 ```
 
-Proporciona una guía de usuario con instrucciones claras sobre cómo interactuar con el dashboard. Utiliza una lista con elementos destacados en negrita para explicar las funcionalidades clave.
+- Tarjeta informativa que explica al usuario cómo operar el dashboard paso a paso.
 
-
-
-### 4. Formulario de Filtros
-
+### 5. Formulario de Filtros
 
 ```html
         <form method="GET" class="filtros">
             <div class="filtro-group">
                 <h3>Filtros:</h3>
             </div>
-            
+
             <div class="filtro-row">
                 <div class="filtro-col">
                     <label for="semestre">Semestre:</label>
                     <select name="semestre" multiple size="5">
                         {% for semestre in semestres %}
-                            <option value="{{ semestre }}" 
+                            <option value="{{ semestre }}"
                                 {% if semestre in filtro_semestre %}selected{% endif %}>
                                 {{ semestre }}
                             </option>
                         {% endfor %}
                     </select>
                 </div>
-                
+
                 <div class="filtro-col">
                     <label for="genero">Género:</label>
                     <select name="genero" multiple size="5">
                         {% for genero in generos %}
-                            <option value="{{ genero }}" 
+                            <option value="{{ genero }}"
                                 {% if genero in filtro_genero %}selected{% endif %}>
                                 {{ genero }}
                             </option>
                         {% endfor %}
                     </select>
                 </div>
-                
+
                 <div class="filtro-col">
                     <label for="materia_id">Materia:</label>
                     <select name="materia_id" multiple size="10">
@@ -5171,7 +5503,7 @@ Proporciona una guía de usuario con instrucciones claras sobre cómo interactua
                         {% for semestre, materias in materias_agrupadas %}
                             <optgroup label="Semestre {{ semestre }}">
                                 {% for id, nombre in materias %}
-                                    <option value="{{ id }}" 
+                                    <option value="{{ id }}"
                                         {% if id|string in filtro_materia %}selected{% endif %}>
                                         {{ nombre }}
                                     </option>
@@ -5181,20 +5513,7 @@ Proporciona una guía de usuario con instrucciones claras sobre cómo interactua
                     </select>
                 </div>
             </div>
-```
 
-Crea un formulario con tres filtros de selección múltiple:
-
-1. Semestre: Lista de semestres disponibles con selección persistente
-
-2. Género: Opciones de género con selección persistente
-
-3. Materia: Lista jerárquica agrupada por semestre con opción "Todas las materias"
-
-### 5. Botones de Acción
-
-
-```html
             <div class="button-group">
                 <button type="submit">Aplicar Filtros</button>
                 <button type="button" class="reset-btn" id="reset-btn">Reiniciar Filtros</button>
@@ -5202,13 +5521,13 @@ Crea un formulario con tres filtros de selección múltiple:
         </form>
 ```
 
-Añade dos botones de acción:
+- Formulario GET con tres selecciones múltiples para semestres, géneros y materias.
 
-- Aplicar Filtros: Envía el formulario para actualizar los gráficos
+- Opciones generadas dinámicamente y marcadas según los filtros activos.
 
-- Reiniciar Filtros: Botón rojo para limpiar todas las selecciones
+- Botones para enviar o resetear los filtros.
 
-### 6. Contenedores para Gráficos Bokeh
+### 6. Gráfico de Barras Embebido
 
 ```html
         <div class="grafico">
@@ -5218,7 +5537,16 @@ Añade dos botones de acción:
             </div>
             {{ script1 | safe }}
         </div>
-        
+```
+
+- Sección dedicada al gráfico de barras.
+
+- Inserta el `div1` y `script1` generados por Bokeh (HTML y JS), marcados como `safe` para no escapar.
+
+
+### 7. Gráfico de Dispersión Embebido
+
+```html
         <div class="grafico">
             <h2>Promedio vs Asistencia</h2>
             <div class="bokeh-wrapper">
@@ -5226,27 +5554,75 @@ Añade dos botones de acción:
             </div>
             {{ script2 | safe }}
         </div>
-    </div>
 ```
 
-Incrusta los componentes de Bokeh generados por Flask:
+- Sección para el scatter plot, con `div2` y `script2` de Bokeh.
 
-1. Primer gráfico: Promedio por materia y género con su contenedor
 
-2. Segundo gráfico: Dispersión de promedio vs asistencia con su contenedor
-
-3. Usa `| safe` para renderizar correctamente el HTML generado
-
-### 7. Scripts Finales y Cierre
-
+### 8. Sección de Alumnos en Riesgo
 
 ```html
+        <!-- Sección de Alumnos en Riesgo (Versión Corregida) -->
+        <div class="grafico">
+            <h2>Alumnos en Riesgo de Reprobación</h2>
+            {% if alumnos_riesgo %}
+            <div class="table-container">
+                <table class="riesgo-table">
+                    <thead>
+                        <tr>
+                            <th>Matrícula</th>
+                            <th>Nombre</th>
+                            <th>Semestre</th>
+                            <th>Materia</th>
+                            <th>Porcentaje</th>
+                            <th>Promedio General</th>
+                            <th>Asistencia</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for alumno in alumnos_riesgo %}
+                        <tr>
+                            <td>{{ alumno.MATRICULA }}</td>
+                            <td>{{ alumno.nombre_completo }}</td>
+                            <td>{{ alumno.SEMESTRE }}</td>
+                            <td>{{ alumno.nombre_materia }}</td>
+                            <td>{{ '%.2f' | format(alumno.porcentaje_materia|float) }}%</td>
+                            <td>{{ '%.2f' | format(alumno.promedio_general|float) }}%</td>
+                            <td>{{ '%.2f' | format(alumno.PORCENTAJE_ASISTENCIA|float) }}%</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p>No se encontraron alumnos en riesgo de reprobación con los filtros seleccionados.</p>
+            {% endif %}
+        </div>
+```
+
+- Muestra una tabla sólo si `alumnos_riesgo` no está vacío.
+
+- Cabeceras estáticas y filas generadas dinámicamente de la lista de alumnos en riesgo.
+
+- Formato porcentual con dos decimales.
+
+### 9. Inclusión del Script de Funcionalidad Adicional
+
+```html
+    </div> <!-- Cierre del container -->
+
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 </html>
 ```
 
-Incluye el archivo JavaScript local para funcionalidades interactivas y cierra las etiquetas del documento HTML.
+- Cierre del contenedor principal.
+
+- Inclusión de `script.js`, que implementa:  
+  - Reinicio de filtros.  
+  - Alternancia de tema oscuro/claro.
+
+- Final del documento HTML.
 
 ###### Para mejor visualización consulte <a href = "anexo\dashboard.html"><i>dashboard.html</i></a>
 
@@ -5254,7 +5630,7 @@ Incluye el archivo JavaScript local para funcionalidades interactivas y cierra l
 
 Para la creación del `styles.css` seguimos los siguientes pasos:
 
-### 1. Variables CSS Globales y Estilos Base
+### 1. Variables de Tema (Root Variables)
 
 ```css
 :root {
@@ -5271,7 +5647,15 @@ Para la creación del `styles.css` seguimos los siguientes pasos:
     --instruction-card: #e1f0fa;
     --instruction-card-dark: #1e3a5f;
 }
+```
 
+- Define variables CSS personalizadas (custom properties) para colores primarios, secundarios, fondos, textos, bordes y tarjetas en modo claro u oscuro.
+
+- Facilitan la tematización y el cambio dinámico de estilo para el modo oscuro.
+
+### 2. Estilos Globales y Modo Oscuro
+
+```css
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 0;
@@ -5287,11 +5671,15 @@ body.dark-mode {
 }
 ```
 
-Define variables CSS para colores clave que permiten alternar entre modos claro/oscuro. Configura estilos base para el cuerpo del documento con transiciones suaves para cambios de tema.
+- Aplica tipografía y espaciado global.
 
+- Establece colores de fondo y texto usando variables.
 
-### 2. Contenedor Principal y Encabezado
+- Añade transición suave para el cambio de tema.
 
+- La clase `.dark-mode` invierte colores a los valores oscuros.
+
+### 3. Contenedor Principal y Header
 
 ```css
 .container {
@@ -5325,10 +5713,15 @@ body.dark-mode .container {
 }
 ```
 
-Diseña el contenedor principal con dimensiones máximas, sombras y bordes redondeados. El encabezado incluye un borde inferior decorativo con el color primario y un título con efecto de sombra de texto.
+- `.container`: limita el ancho y añade fondo, padding, borde redondeado y sombra suave.
 
-### 3. Selector de Tema e Instrucciones
+- Cambia el fondo y sombra en modo oscuro.
 
+- `.header`: centra e incluye un borde inferior con color primario.
+
+- Ajusta estilo del `<h1>` con color, tamaño y sombra de texto.
+
+### 4. Botón de Cambio de Tema
 
 ```css
 .theme-switcher {
@@ -5353,7 +5746,15 @@ Diseña el contenedor principal con dimensiones máximas, sombras y bordes redon
     background-color: var(--secondary-color);
     transform: translateY(-2px);
 }
+```
 
+- Posiciona el contenedor del botón en la esquina superior derecha.
+
+- `.theme-btn`: estilo de botón con color principal, bordes redondeados, sombra y efecto hover que cambia a color secundario y desplaza ligeramente.
+
+### 5. Tarjeta de Instrucciones
+
+```css
 .instruction-card {
     background-color: var(--instruction-card);
     border-left: 5px solid var(--primary-color);
@@ -5382,12 +5783,13 @@ body.dark-mode .instruction-card h3 {
 }
 ```
 
-Posiciona el botón de cambio de tema en la esquina superior derecha con efectos hover. La tarjeta de instrucciones muestra un borde lateral de acento y cambia completamente de apariencia en modo oscuro.
+- Define fondo, borde izquierdo de énfasis, padding y redondeo.
 
+- Cambia colores en modo oscuro.
 
+- Ajusta estilo de título y lista interna.
 
-### 4. Sistema de Filtros
-
+### 6. Estilos del Formulario de Filtros
 
 ```css
 .filtros {
@@ -5460,12 +5862,15 @@ body.dark-mode .filtros select {
 }
 ```
 
-Crea un área de filtros semitransparente con controles de selección múltiple. Los botones tienen efectos interactivos y el botón de reinicio se destaca en rojo. Todos los elementos se adaptan visualmente al modo oscuro.
+- `.filtros`: estilo del contenedor de filtros con fondo semitransparente, borde y padding.
 
+- Adapta colores de fondo y borde en modo oscuro.
 
+- Estilo de etiquetas (`label`), selectores (`select`) y botones, con transiciones y efectos hover.
 
-### 5. Contenedores de Gráficos
+- `.reset-btn`: botón de reinicio con color rojo destacado.
 
+### 7. Sección de Gráficos (Wrapper)
 
 ```css
 .grafico {
@@ -5494,6 +5899,26 @@ body.dark-mode .grafico h2 {
     color: #64b5f6;
     border-bottom-color: var(--border-dark);
 }
+```
+
+- `.grafico`: estilo de cada sección de gráfico con borde, padding y fondo.
+
+- Ajuste para modo oscuro.
+
+- Encabezado `<h2>` con color, tamaño y borde inferior.
+
+
+### 8. Layouts de Filtros y Wrapper de Bokeh
+
+```css
+.filtro-group { margin-bottom: 20px; }
+.filtro-group h3 { font-size: 18px; color: var(--text-light); }
+body.dark-mode .filtro-group h3 { color: var(--text-dark); }
+.filtro-row { display: flex; flex-wrap: wrap; gap: 25px; }
+.filtro-col { flex: 1; min-width: 250px; }
+.optgroup { font-weight: bold; background-color: #f9f9f9; }
+body.dark-mode optgroup { background-color: #2c3e50; }
+optgroup option { padding-left: 20px; font-weight: normal; }
 
 .bokeh-wrapper {
     overflow: auto;
@@ -5504,79 +5929,79 @@ body.dark-mode .grafico h2 {
     background-color: white;
     transition: all 0.3s;
 }
-
 body.dark-mode .bokeh-wrapper {
     background-color: #2c3e50;
     border-color: var(--border-dark);
 }
+.bokeh-plot { overflow-x: auto; }
+.bokeh-wrapper .bk-root .bk-axis-label { font-size: 12pt; }
 ```
 
-Diseña contenedores para gráficos con bordes, relleno y fondo adaptativos. Los títulos de sección incluyen bordes inferiores decorativos. El contenedor Bokeh tiene desplazamiento para gráficos grandes y cambia de fondo en modo oscuro.
+- Define layout flex para filas y columnas de filtros.
+
+- Estilo de `optgroup` y sus `option`.
+
+- `.bokeh-wrapper`: contenedor de gráficos con scroll, borde y fondo.
+
+- Ajustes para modo oscuro y tamaño de etiquetas de ejes.
 
 
-
-### 6. Componentes Adicionales y Utilidades
-
+### 9. Agrupación de Botones y Tabla de Riesgo
 
 ```css
-.filtro-group {
-    margin-bottom: 20px;
-}
+.button-group { display: flex; gap: 10px; margin-top: 15px; }
 
-.filtro-group h3 {
-    margin-bottom: 12px;
-    font-size: 18px;
-    color: var(--text-light);
-}
-
-body.dark-mode .filtro-group h3 {
-    color: var(--text-dark);
-}
-
-optgroup {
-    font-weight: bold;
-    font-style: normal;
-    background-color: #f9f9f9;
-}
-
-body.dark-mode optgroup {
-    background-color: #2c3e50;
-}
-
-optgroup option {
-    padding-left: 20px;
-    font-weight: normal;
-}
-
-.filtro-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 25px;
-}
-
-.filtro-col {
-    flex: 1;
-    min-width: 250px;
-}
-
-.bokeh-plot {
+.table-container {
     overflow-x: auto;
+    margin-top: 20px;
+    border: 1px solid var(--border-light);
+    border-radius: 5px;
+    padding: 10px;
+    background-color: white;
+    transition: all 0.3s;
+}
+body.dark-mode .table-container {
+    background-color: #2c3e50;
+    border-color: var(--border-dark);
 }
 
-.bokeh-wrapper .bk-root .bk-axis-label {
-    font-size: 12pt;
+.riesgo-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
 }
-
-.button-group {
-    display: flex;
-    gap: 10px;
-    margin-top: 15px;
+.riesgo-table th, .riesgo-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-light);
+}
+body.dark-mode .riesgo-table th,
+body.dark-mode .riesgo-table td {
+    border-bottom: 1px solid var(--border-dark);
+}
+.riesgo-table th {
+    background-color: var(--primary-color);
+    color: white;
+    font-weight: bold;
+}
+body.dark-mode .riesgo-table th {
+    background-color: var(--secondary-color);
+}
+.riesgo-table tbody tr:hover {
+    background-color: rgba(52, 152, 219, 0.1);
+}
+body.dark-mode .riesgo-table tbody tr:hover {
+    background-color: rgba(41, 128, 185, 0.2);
 }
 ```
 
-Organiza los filtros en columnas flexibles responsivas. Personaliza grupos de opciones en selects con sangrías y fondos diferenciados. Ajusta el tamaño de fuente de etiquetas en gráficos Bokeh y agrupa botones con espaciado uniforme.
+- `.button-group`: organiza botones en fila con separación.
 
+- `.table-container`: contenedor scrollable para la tabla de alumnos en riesgo.
 
+- `.riesgo-table`: estilo de tabla con bordes, padding y efecto hover en filas.
+
+- Adapta colores de fondo y bordes en modo oscuro.
 
 ###### Para mejor visualización consulte <a href = "anexo\styles.css"><i>styles.css</i></a>
 
@@ -5736,6 +6161,254 @@ posteriormente, también se realiza la instalación de `mysqlclient`
 
 ###### El dashboard se encuentra disponible en: <a><i>https://fedivej259.pythonanywhere.com/</i></a>
 
+# Fase de pruebas
+
+Para hacer una demostración de la funcionalidad de nuestro dashboard, nos propusimos realizarle la siguiente lista de pruebas:
+
+## 1. Filtro por semestre único
+
+### Seleccionamos un semestre
+
+<img src = "media\Pruebas\1. Semestre unico\1. Seleccion.png">
+
+### Visualizamos la gráfica de barras
+
+<img src = "media\Pruebas\1. Semestre unico\2. Barras.png">
+
+y comprobamos que solo hay materias del semestre seleccionado (sexto semestre).
+
+### Visualizamos la gráfica de dispersión
+
+<img src = "media\Pruebas\1. Semestre unico\3. Dispersion.png">
+
+### Visualizamos la lista de alumnos con riesgo de reprobación
+
+<img src = "media\Pruebas\1. Semestre unico\4.1 R.png">
+
+<img src = "media\Pruebas\1. Semestre unico\4.2 R.png">
+
+<img src = "media\Pruebas\1. Semestre unico\4.3 R.png">
+
+<img src = "media\Pruebas\1. Semestre unico\4.4 R.png">
+
+y comprobamos que todos los alumnos son del semestre seleccionado (sexto semestre).
+
+## 2. Filtro por género único
+
+### Seleccionamos un género
+
+<img src = "media\Pruebas\2. Genero unico\1. Genero.png">
+
+### Visualizamos la gráfica de barras
+
+<img src = "media\Pruebas\2. Genero unico\2. Barras.png">
+
+y comprobamos que solo podemos ver alumnos del sexo seleccionado (femenino).
+
+### Visualizamos la gráfica de dispersión
+
+<img src = "media\Pruebas\2. Genero unico\3. Dispersion.png">
+
+### Visualizamos la lista de alumnos con riesgo de reprobación
+
+<img src = "media\Pruebas\2. Genero unico\4.1 R.png">
+
+<img src = "media\Pruebas\2. Genero unico\4.2 R.png">
+
+<img src = "media\Pruebas\2. Genero unico\4.3 R.png">
+
+<img src = "media\Pruebas\2. Genero unico\4.4 R.png">
+
+<img src = "media\Pruebas\2. Genero unico\4.5 R.png">
+
+y comprobamos que todos los alumnos son del sexo seleccionado (femenino).
+
+## Filtro por materia
+
+### Seleccionamos una materia
+
+<img src = "media\Pruebas\3. Materia unica\1. Materia.png">
+
+### Visualizamos la gráfica de barras
+
+<img src = "media\Pruebas\3. Materia unica\2. Barras.png">
+
+### Visualizamos la gráfica de dispersión
+
+<img src = "media\Pruebas\3. Materia unica\3. Dispersion.png">
+
+### Visualizamos la lista de alumnos con riesgo de reprobación
+
+<img src = "media\Pruebas\3. Materia unica\4. R.png">
+
+## Filtro por semestre y género
+
+### Seleccionamos un semestre y un género
+
+<img src = "media\Pruebas\4. Semestre + Genero\1. Seleccion.png">
+
+### Visualizamos la gráfica de barras
+
+<img src = "media\Pruebas\4. Semestre + Genero\2. Barras.png">
+
+### Visualizamos la gráfica de dispersión
+
+<img src = "media\Pruebas\4. Semestre + Genero\3. Dispersion.png">
+
+### Visualizamos la lista de alumnos con riesgo de reprobación
+
+<img src = "media\Pruebas\4. Semestre + Genero\4. R.png">
+
+y comprobamos que sean del género y el semestre seleccionado.
+
+## Filtro por semestre y materia
+
+### Seleccionamos un semestre y una materia
+
+<img src = "media\Pruebas\5. Semestre + Materia\1. Seleccion.png">
+
+### Visualizamos la gráfica de barras
+
+<img src = "media\Pruebas\5. Semestre + Materia\2. Barras.png">
+
+### Visualizamos la gráfica de dispersión
+
+<img src = "media\Pruebas\5. Semestre + Materia\3. Dispersion.png">
+
+### Visualizamos la lista de alumnos con riesgo de reprobación
+
+<img src = "media\Pruebas\5. Semestre + Materia\4. R.png">
+
+y comprobamos que solo podemos ver alumnos del semestre seleccionado y sus registros de la materia que seleccionamos.
+
+## Filtro por Semestre, Genero y Materia
+
+### Seleccionamos un semestre, un género y una materia
+
+<img src = "media\Pruebas\6. Semestre + Genero + Materia\1. Seleccion.png">
+
+### Visualizamos la gráfica de barras
+
+<img src = "media\Pruebas\6. Semestre + Genero + Materia\2. Barras.png">
+
+### Visualizamos la gráfica de dispersión
+
+<img src = "media\Pruebas\6. Semestre + Genero + Materia\3. Dispersion.png">
+
+### Visualizamos la lista de alumnos con riesgo de reprobación
+
+<img src = "media\Pruebas\6. Semestre + Genero + Materia\4. R.png">
+
+## Filtro por semestre y una materia <i>cruzada</i>
+
+### Seleccionamos un semestre y una materia que no corresponde a dicho semestre
+
+<img src = "media\Pruebas\7. Semestre + Materia no correspondiente\1. Seleccion.png">
+
+### Visualizamos la gráfica de barras
+
+<img src = "media\Pruebas\7. Semestre + Materia no correspondiente\2. Barras.png">
+
+y comprobamos que no hay contenido graficado.
+
+### Visualizamos la gráfica de dispersión
+
+<img src = "media\Pruebas\7. Semestre + Materia no correspondiente\3. Dispersion.png">
+
+y comprobamos que no hay contenido graficado.
+
+## Visualizamos la lista de alumnos con riesgo de reprobación
+
+<img src = "media\Pruebas\7. Semestre + Materia no correspondiente\4. R.png">
+
+y comprobamos que no hay contenido disponible.
+
+#### **¡Por lo que concluimos que el dashboard esta listo!**
+
 # Repositorio
 
 Almacenamos los archivos fuente de nuestra actividad dentro de: <a><i>https://github.com/acamacho0723/dags-etl-23062025</i></a>
+
+## Historial de cambios
+
+El equipo realizó un trabajo en conjunto en cuanto al desarrollo del dashboard web. Se realizaron los siguientes commits:
+
+<img src = "media\commits\1. .png">
+
+<img src = "media\commits\2..png">
+
+###### Las capturas estan actualizadas a la fecha 26/06/2025
+
+# Anexo
+
+## Creación de los datasets para el análisis
+
+### Dataset de calificaciones
+
+Programa utilizado - <a href = "anexo\ETL\Generador - Calificaciones.py"><i>Generador - Calificaciones.py</i></a>
+
+Resultados:
+
+1. <a href = "anexo\data\calificaciones\calificaciones.csv"><i>calificaciones.csv</i></a>
+2. <a href = "anexo\data\calificaciones\calificaciones.json"><i>calificaciones.json</i></a>
+3. <a href = "anexo\data\calificaciones\calificaciones.xml"><i>calificaciones.xml</i></a>
+
+### Dataset de asistencias
+
+Programa utilizado - <a href = "anexo\ETL\Generador - Asistencias.py"><i>Generador - Asistencias.py</i></a>
+
+Resultados:
+
+1. <a href = "anexo\data\asistencia\asistencia.csv"><i>asistencias.csv</i></a>
+2. <a href = "anexo\data\asistencia\asistencia.json"><i>asistencias.json</i></a>
+3. <a href = "anexo\data\asistencia\asistencia.xml"><i>asistencias.xml</i></a>
+
+### Dataset de datos demográficos
+
+Programa utilizado - <a href = "anexo\ETL\Generador - Datos demograficos.py"><i>Generador - Datos demograficos.py</i></a>
+
+Resultados:
+
+1. <a href = "anexo\data\datos_demograficos\datos_demograficos.csv"><i>datos_demograficos.csv</i></a>
+2. <a href = "anexo\data\datos_demograficos\datos_demograficos.json"><i>datos_demograficos.json</i></a>
+3. <a href = "anexo\data\datos_demograficos\datos_demograficos.xml"><i>datos_demograficos.xml</i></a>
+
+###### El semestre de los alumnos para este último programa fue adquirido de <a href = "anexo\tmp\calificaciones.csv"><i>calificaciones.csv</i></a>
+
+## Unión y cálculo de métricas
+
+Programa utilizado - <a href = "anexo\ETL\extractor.py"><i>extractor.py</i></a>
+
+Resultado - <a href = "anexo\data\consolidado\datos_consolidados.csv"><i>datos_consolidados.csv</i></a>
+
+### Comprobación
+
+Hoja de cálculo utilizada - <a href = "anexo\tmp\Comprobacion.xlsx"><i>Comprobacion.xlsx</i></a>
+
+## Estructura Multidimensional
+
+### Propuesta
+
+Diccionario de datos utilizado - <a href = "anexo\tmp\Diccionario - Consolidado.xlsx"><i>Diccionario - Consolidado.xlsx</i></a>
+
+Diagrama utilizado - <a href = "media\diagramas\1. Cubo.svg"><i>1. Cubo.svg</i></a>
+
+### Implementación
+
+Programa utilizado - <a href = "anexo\ETL\cubo.py"><i>cubo.py</i></a>
+
+Resultado del procedimiento - <a href = "anexo\ETL\cubo_escolar.sql"><i>cubo_escolar.sql</i></a>
+
+## Creación de dashboard web interactivo
+
+<a href = "anexo\Dashboard\flask_app.py"><i>flask_app.py</i></a>
+
+<a href = "anexo\Dashboard\dashboard.html"><i>dashboard.html</i></a>
+
+<a href = "anexo\Dashboard\styles.css"><i>styles.css</i></a>
+
+<a href = "anexo\Dashboard\script.js"><i>script.js</i></a>
+
+### El dashboard esta disponible en: <a><i>https://fedivej259.pythonanywhere.com/</i></a>
+
+###### Incluimos los datos para la conexión a nuestra bd en <a href = "anexo\tmp\passwd.txt"><i>passwd.txt</i></a>
